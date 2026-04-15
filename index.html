@@ -7061,7 +7061,9 @@
                 const userY_px = userY * scaleY;
 
                 // 3. Rotação Ancorada (Frente para Cima / Heading-Up)
-                const bearing = this.isCompassActive ? this.compassBearing : 0;
+                // Offset Predial: Calibrado para alinhar com a estrutura da empresa (-22.5°)
+                const BUILDING_OFFSET = -22.5;
+                const bearing = this.isCompassActive ? (this.compassBearing + BUILDING_OFFSET) : 0;
 
                 // 4. Centralização (Trava de Câmera)
                 // Se GPS ativo, forçamos o ponto roxo no centro absoluto (Magnetic Focus)
