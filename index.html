@@ -7012,12 +7012,13 @@
                 const userX_px = userX * scaleX;
                 const userY_px = userY * scaleY;
 
-                // 3. Rotação Ancorada (Frente para Cima / Heading-Up)
-                const bearing = this.isCompassActive ? this.compassBearing : 0;
+                // 3. Rotação Ancorada (Frente para Cima / Heading-Up) + Calibração 180°
+                const bearing = (this.isCompassActive ? this.compassBearing : 0) + 180;
 
                 // 4. Centralização (Trava de Câmera)
-                const targetX = containerW / 2 + this.panX;
-                const targetY = containerH / 2 + this.panY;
+                // Se GPS ativo, forçamos o ponto roxo no centro absoluto (Magnetic Focus)
+                const targetX = containerW / 2 + (this.isCompassActive ? 0 : this.panX);
+                const targetY = containerH / 2 + (this.isCompassActive ? 0 : this.panY);
 
                 const dx = targetX - userX_px;
                 const dy = targetY - userY_px;
@@ -7026,7 +7027,7 @@
                 svgEl.style.transformOrigin = `${userX_px}px ${userY_px}px`;
                 svgEl.style.transform = `translate(${dx}px, ${dy}px) scale(1) rotate(${-bearing}deg)`;
 
-                // 5. Giro do Ícone Roxo (Olhar para onde o celular aponta)
+                // 5. Giro do Ícone Roxo (Olhar para onde o celular aponta + Calibração 180°)
                 const arrow = document.getElementById('userHeadingArrow');
                 if (arrow) {
                     // Rotaciona a seta para compensar o giro do mapa e apontar pro 'Topo' do celular
@@ -7382,8 +7383,8 @@
                 const endX = destPos.x * colWidth + (colWidth / 2) + 3;
 
                 opcoesDestino.forEach(opt => {
-                    let d_temp = `M ${startX} ${startBaseY} L ${startX} ${startY}`;
-                    let currentLen = Math.abs(startBaseY - startY);
+                    let d_temp = `M ${startX} ${startY}`;
+                    let currentLen = 0;
 
                     if (startY === opt.y) {
                         // Mesmo corredor: Reta direta
@@ -7404,11 +7405,8 @@
                         currentLen += minTxDist + Math.abs(opt.y - startY);
                     }
 
-                    d_temp += ` L ${endX} ${opt.baseY}`;
-                    currentLen += Math.abs(opt.baseY - opt.y);
-
                     if (currentLen < melhorPath.len) {
-                        melhorPath = { d: d_temp, len: currentLen, endX: endX, endBaseY: opt.baseY };
+                        melhorPath = { d: d_temp, len: currentLen, endX: endX, endBaseY: opt.y };
                     }
                 });
 
@@ -7417,7 +7415,7 @@
                 pathContainer.innerHTML = `
                     <path d="${melhorPath.d}" class="wayfinder-path" id="routePath" marker-end="url(#wayfinderArrow)" />
                     <!-- Marcador de Origem (Estilo GPS dinâmico) -->
-                    <g transform="translate(${startX}, ${startBaseY})" id="userMarkerGroup">
+                    <g transform="translate(${startX}, ${startY})" id="userMarkerGroup">
                         <circle r="15" class="gps-pulse-circle" />
                         <circle r="8" fill="rgba(168, 85, 247, 0.2)" stroke="#a855f7" stroke-width="1" />
                         <path d="M-5,4 L0,-7 L5,4 L0,2 Z" class="gps-cursor-pointer" id="userHeadingArrow" />
@@ -8566,10 +8564,10 @@
                     <div class="wayfinder-svg-wrapper" id="wayfinderMapContainer"
                         style="border-radius: 20px; min-height: 650px; overflow: hidden; position: relative; background: #000;">
                         <!-- Indicadores Cardeais -->
-                        <div class="wayfinder-cardinal cardinal-n">NORTE (PAREDE)</div>
-                        <div class="wayfinder-cardinal cardinal-s">SUL</div>
-                        <div class="wayfinder-cardinal cardinal-l">LESTE</div>
-                        <div class="wayfinder-cardinal cardinal-o">OESTE</div>
+                        <div class="wayfinder-cardinal cardinal-n">SUL</div>
+                        <div class="wayfinder-cardinal cardinal-s">NORTE (PAREDE)</div>
+                        <div class="wayfinder-cardinal cardinal-l">OESTE</div>
+                        <div class="wayfinder-cardinal cardinal-o">LESTE</div>
 
                         <div id="wayfinderMap"
                             style="width: 100%; height: 100%; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
