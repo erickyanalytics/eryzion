@@ -1900,45 +1900,88 @@
             padding-bottom: 8px;
         }
 
-        .origin-btn-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+         /* Styles for QR Origin Scanner */
+        .origin-scanner-container {
+            width: 100%;
+            aspect-ratio: 1/1;
+            background: #000;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            border: 2px solid rgba(0, 255, 65, 0.2);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
         }
 
-        .origin-select-btn {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 14px;
-            height: 50px;
+        .origin-qr-reader {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .origin-qr-reader video {
+            object-fit: cover !important;
+        }
+
+        .origin-qr-laser {
+            position: absolute;
+            top: 20%;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: var(--color-primary);
+            box-shadow: 0 0 15px var(--color-primary), 0 0 30px var(--color-primary);
+            z-index: 10;
+            pointer-events: none;
+            animation: qr-laser-move 3s infinite ease-in-out;
+            opacity: 0.6;
+        }
+
+        @keyframes qr-laser-move {
+            0%, 100% { top: 20%; }
+            50% { top: 80%; }
+        }
+
+        .origin-qr-overlay-text {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            z-index: 10;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            opacity: 0.8;
+        }
+
+        .origin-scanner-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-origin-camera {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #fff;
-            font-size: 14px;
-            font-weight: 800;
-            cursor: pointer;
+            gap: 8px;
             transition: 0.3s;
         }
 
-        .origin-select-btn:hover {
-            background: rgba(0, 255, 65, 0.1);
-            border-color: #00ff41;
-            color: #00ff41;
-            transform: translateY(-2px);
-            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
-        }
-
-        .origin-select-btn.verso {
-            color: #a855f7;
-            border-color: rgba(168, 85, 247, 0.2);
-        }
-
-        .origin-select-btn.verso:hover {
-            background: rgba(168, 85, 247, 0.1);
-            border-color: #a855f7;
-            color: #a855f7;
-            box-shadow: 0 0 15px rgba(168, 85, 247, 0.2);
+        .btn-origin-camera:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
         }
 
         .origin-close-btn {
@@ -6892,6 +6935,11 @@
             // Session Lock to prevent multiple geolocation prompts
             _sessionGpsGranted: false,
 
+            // State for Origin Scanner
+            originQrScanner: null,
+            currentOriginCameraId: null,
+            isOriginFlashOn: false,
+
             init: function (destShelfName) {
                 this.currentDest = `CABOS - ${destShelfName}`;
                 this.currentProgress = 0;
@@ -7098,6 +7146,90 @@
                 }
             },
 
+            // GPS ORIGIN QR SCANNER ENGINE
+            startOriginScanner: function () {
+                if (this.originQrScanner) return;
+
+                const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+                this.originQrScanner = new Html5Qrcode("origin-reader");
+
+                Html5Qrcode.getCameras().then(devices => {
+                    if (devices && devices.length > 0) {
+                        const backCamera = devices.find(d => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('traseira')) || devices[devices.length - 1];
+                        this.currentOriginCameraId = backCamera.id;
+                        this.originQrScanner.start(
+                            this.currentOriginCameraId,
+                            config,
+                            (text) => this.processQrResult(text)
+                        ).catch(err => {
+                            console.error("Scanner Error:", err);
+                            showToast("Erro ao abrir câmera", "error");
+                        });
+                    } else {
+                        showToast("Câmera não encontrada", "warning");
+                    }
+                }).catch(err => {
+                    console.error("Camera Access Error:", err);
+                    showToast("Permissão de câmera negada", "error");
+                });
+            },
+
+            stopOriginScanner: function () {
+                if (this.originQrScanner) {
+                    this.originQrScanner.stop().then(() => {
+                        this.originQrScanner = null;
+                        this.isOriginFlashOn = false;
+                    }).catch(err => {
+                        // Silently stop if already cleared
+                        this.originQrScanner = null;
+                    });
+                }
+            },
+
+            processQrResult: function (text) {
+                if (!text) return;
+
+                // Formato: F, G, FV, GV...
+                let shelf = text.toUpperCase().trim();
+                if (shelf.length < 1) return;
+
+                let cleanLabel = shelf[0]; // Primeira letra
+                let isVerso = shelf.includes('V');
+
+                let targetLabel = isVerso ? `${cleanLabel}-VERSO` : cleanLabel;
+
+                // Feedback
+                if ('vibrate' in navigator) navigator.vibrate(100);
+                showToast(`📍 Origem: ${targetLabel}`, "success");
+
+                this.stopOriginScanner();
+                selecionarOrigemRapida(targetLabel);
+            },
+
+            switchOriginCamera: function () {
+                if (!this.originQrScanner) return;
+                Html5Qrcode.getCameras().then(devices => {
+                    if (devices.length > 1) {
+                        const currentIndex = devices.findIndex(d => d.id === this.currentOriginCameraId);
+                        const nextIndex = (currentIndex + 1) % devices.length;
+                        this.currentOriginCameraId = devices[nextIndex].id;
+                        this.stopOriginScanner();
+                        setTimeout(() => this.startOriginScanner(), 400);
+                    }
+                });
+            },
+
+            toggleOriginFlash: function () {
+                if (this.originQrScanner) {
+                    this.isOriginFlashOn = !this.isOriginFlashOn;
+                    this.originQrScanner.applyVideoConstraints({
+                        advanced: [{ torch: this.isOriginFlashOn }]
+                    }).catch(err => {
+                        showToast("Flash indisponível", "warning");
+                    });
+                }
+            },
+
             startCompass: function () {
                 const btn = document.getElementById('btnCompassToggle');
 
@@ -7169,9 +7301,9 @@
                         // Calcula distância percorrida desde o início (em metros aprox)
                         const dist = this.calculateDistance(this.startPos.lat, this.startPos.lon, latitude, longitude);
 
-                        // Mapeia 30 metros de caminhada = 100% da rota interna
-                        // (Ajustável conforme o tamanho real do galpão)
-                        const walkScale = 30;
+                        // Calibração de Campo: 11 prateleiras reais = 4 virtuais (Ratio 2.75x)
+                        // Mapeia ~11 metros de caminhada = 100% da rota interna
+                        const walkScale = 11;
                         this.currentProgress = Math.min(0.98, dist / walkScale);
 
                         this.updateMarkerOnPath();
@@ -7464,6 +7596,8 @@
             if (overlay) {
                 overlay.classList.add('active');
                 document.body.classList.add('modal-open');
+                // Inicia o scanner automaticamente
+                setTimeout(() => Wayfinder.startOriginScanner(), 400);
             } else {
                 Wayfinder.ensurePermissions(() => {
                     const p = RESULTADOS_ATUAIS[index];
@@ -8414,56 +8548,34 @@
     <!-- NOVO: Seletor de Origem (Grid Manual Fallback) -->
     <div id="wayfinderOriginOverlay" class="wayfinder-origin-overlay">
         <div class="origin-selector-card">
-            <button class="origin-close-btn"
-                onclick="document.getElementById('wayfinderOriginOverlay').classList.remove('active')">&times;</button>
-            <div class="origin-selector-title">ONDE VOCÊ ESTÁ?</div>
+            <button class="origin-close-btn" onclick="Wayfinder.stopOriginScanner(); fecharWayfinderRapido()">&times;</button>
+            <div class="origin-selector-title">ESCANEIE A PRATELEIRA</div>
 
-            <div class="origin-grid-container">
-                <!-- Coluna Frente -->
-                <div class="origin-column">
-                    <div class="origin-column-title">FRENTE</div>
-                    <div class="origin-btn-grid">
-                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('A')">A</button>
-                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('B')">B</button>
-                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('C')">C</button>
-                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('D')">D</button>
-                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('E')">E</button>
-                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('F')">F</button>
-                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('G')">G</button>
-                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('H')">H</button>
-                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('I')">I</button>
-                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('J')">J</button>
-                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('K')">K</button>
-                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('L')">L</button>
-                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('M')">M</button>
-                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('N')">N</button>
-                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('O')">O</button>
-                    </div>
-                </div>
+            <div class="origin-scanner-container">
+                <div id="origin-reader" class="origin-qr-reader"></div>
+                <div class="origin-qr-laser"></div>
+                <div class="origin-qr-overlay-text">Aponte para o QR da Prateleira</div>
+            </div>
 
-                <!-- Coluna Verso -->
-                <div class="origin-column">
-                    <div class="origin-column-title">VERSO</div>
-                    <div class="origin-btn-grid">
-                        <button class="origin-select-btn verso" onclick="selecionarOrigemRapida('A-VERSO')">A-V</button>
-                        <button class="origin-select-btn verso" onclick="selecionarOrigemRapida('B-VERSO')">B-V</button>
-                        <button class="origin-select-btn verso" onclick="selecionarOrigemRapida('C-VERSO')">C-V</button>
-                        <button class="origin-select-btn verso" onclick="selecionarOrigemRapida('D-VERSO')">D-V</button>
-                        <button class="origin-select-btn verso" onclick="selecionarOrigemRapida('E-VERSO')">E-V</button>
-                        <button class="origin-select-btn verso" onclick="selecionarOrigemRapida('F-VERSO')">F-V</button>
-                        <button class="origin-select-btn verso" onclick="selecionarOrigemRapida('G-VERSO')">G-V</button>
-                        <button class="origin-select-btn verso" onclick="selecionarOrigemRapida('H-VERSO')">H-V</button>
-                        <button class="origin-select-btn verso" onclick="selecionarOrigemRapida('I-VERSO')">I-V</button>
-                        <button class="origin-select-btn verso" onclick="selecionarOrigemRapida('J-VERSO')">J-V</button>
-                        <button class="origin-select-btn verso" onclick="selecionarOrigemRapida('K-VERSO')">K-V</button>
-                    </div>
-                </div>
+            <div class="origin-scanner-controls">
+                <button class="btn-origin-camera" onclick="Wayfinder.toggleOriginFlash()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                    </svg>
+                    Flash
+                </button>
+                <button class="btn-origin-camera" onclick="Wayfinder.switchOriginCamera()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M23 4v6h-6M1 20v-6h6" />
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+                    </svg>
+                    Câmera
+                </button>
             </div>
 
             <div style="margin-top:20px; text-align:center;">
-                <button class="btn" onclick="selecionarOrigemRapida('AUTO')"
-                    style="background:var(--color-primary); color:#000; font-size:12px; padding:10px;">USAR MEU GPS
-                    AUTOMÁTICO</button>
+                <button class="btn" onclick="Wayfinder.stopOriginScanner(); selecionarOrigemRapida('AUTO')"
+                    style="background:rgba(255,255,255,0.05); color:#fff; font-size:11px; padding:12px; width: 100%; border: 1px solid rgba(255,255,255,0.1);">USAR GPS AUTOMÁTICO (MAPA)</button>
             </div>
         </div>
     </div>
