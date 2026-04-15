@@ -202,6 +202,33 @@
             color: var(--color-primary);
         }
 
+        .camera-select-wrapper {
+            position: relative;
+            flex: 1;
+        }
+
+        .scanner-select {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 12px 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            appearance: none;
+            backdrop-filter: var(--glass-blur);
+            outline: none;
+            transition: var(--transition-normal);
+            text-align: center;
+        }
+
+        .scanner-select:focus {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+        }
+
         .scan-laser {
             position: absolute;
             top: 0;
@@ -215,10 +242,23 @@
         }
 
         @keyframes scan-move {
-            0% { top: 10%; opacity: 0; }
-            5% { opacity: 1; }
-            95% { opacity: 1; }
-            100% { top: 90%; opacity: 0; }
+            0% {
+                top: 10%;
+                opacity: 0;
+            }
+
+            5% {
+                opacity: 1;
+            }
+
+            95% {
+                opacity: 1;
+            }
+
+            100% {
+                top: 90%;
+                opacity: 0;
+            }
         }
 
         .glass-panel {
@@ -1580,12 +1620,48 @@
             stroke-linecap: round;
             stroke-linejoin: round;
             filter: drop-shadow(0 0 12px rgba(0, 255, 65, 0.6));
+            stroke-dasharray: 10, 5;
+            transition: stroke-dashoffset 0.1s linear;
         }
 
         .wayfinder-marker {
             filter: drop-shadow(0 0 10px currentColor);
-            stroke: rgba(255, 255, 255, 0.2);
-            stroke-width: 1;
+        }
+
+        /* GPS FOLLOW MODE EFFECTS */
+        #wayfinderMap svg {
+            transition: transform 0.4s cubic-bezier(0.2, 0, 0.2, 1);
+            transform-origin: center center;
+            will-change: transform;
+        }
+
+        .gps-cursor-pointer {
+            fill: #a855f7;
+            stroke: #fff;
+            stroke-width: 1.5;
+            filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.8));
+        }
+
+        .gps-pulse-circle {
+            animation: gps-pulse 2s infinite;
+            fill: rgba(168, 85, 247, 0.3);
+        }
+
+        @keyframes gps-pulse {
+            0% {
+                r: 5;
+                opacity: 0.8;
+            }
+
+            100% {
+                r: 25;
+                opacity: 0;
+            }
+        }
+
+        .hud-point.origin.pulse {
+            border-color: #a855f7;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
         }
 
         .wayfinder-dot-pattern {
@@ -1728,10 +1804,12 @@
             font-weight: 700;
             cursor: pointer;
             transition: 0.3s;
-            display: none; /* Só aparece se estiver em iframe */
+            display: none;
+            /* Só aparece se estiver em iframe */
             align-items: center;
             gap: 6px;
         }
+
         .btn-fullscreen:hover {
             background: rgba(255, 255, 255, 0.1);
             color: #fff;
@@ -2783,7 +2861,8 @@
                 display: flex;
                 align-items: baseline;
                 gap: 6px;
-                padding-right: 145px; /* Garantir que 3 botes caibam */
+                padding-right: 145px;
+                /* Garantir que 3 botes caibam */
             }
 
             .card-technical-data {
@@ -2875,7 +2954,7 @@
                 width: 32px;
                 height: 32px;
                 top: 15px;
-                right: 55px;
+                right: 60px;
                 /* Offset para não encostar no aviso */
                 border-radius: 10px;
                 background: rgb(0, 0, 0);
@@ -2883,13 +2962,11 @@
                 backdrop-filter: blur(8px);
             }
 
-            .btn-card-temp {
+            .btn-quick-gps {
                 top: 15px;
-                right: 95px;
-                /* Offset para terceiro botão caso exista */
+                right: 105px;
                 width: 32px;
                 height: 32px;
-                font-size: 13px;
                 border-radius: 10px;
                 background: rgb(0, 0, 0);
                 color: #fff;
@@ -4518,7 +4595,7 @@
                             </path>
                             <circle cx="12" cy="13" r="4"></circle>
                         </svg>
-                        <h2 style="color: var(--color-primary); font-size: 18px; margin: 0;">Scanner em Tempo Real</h2>
+                        <h2 style="color: var(--color-primary); font-size: 18px; margin: 0;">Scanner</h2>
                     </div>
                     <button class="modal-close-button" onclick="fecharScanner()">&times;</button>
                 </div>
@@ -4529,15 +4606,16 @@
                     </div>
 
                     <div class="scanner-controls">
-                        <button id="toggleCameraBtn" class="btn-scanner-action" onclick="toggleCamera()">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M23 7l-7 5 7 5V7z"></path>
-                                <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
-                            </svg>
-                            Mudar Câmera
-                        </button>
-                        <button id="toggleFlashBtn" class="btn-scanner-action" onclick="toggleFlash()">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <div class="camera-select-wrapper">
+                            <select id="cameraSelection" class="scanner-select"
+                                onchange="trocarCameraPorMenu(this.value)">
+                                <option value="">Carregando câmeras...</option>
+                            </select>
+                        </div>
+                        <button id="toggleFlashBtn" class="btn-scanner-action" onclick="toggleFlash()"
+                            style="flex: 0 0 auto;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
                                 <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
                             </svg>
                             Flash
@@ -4996,55 +5074,76 @@
         };
 
         function extrairValoresUnicos() {
+            const start = performance.now();
             const tempValores = { Mercado: new Set(), Prateleira: new Set(), Local: new Set(), Aplicador: new Set(), Cor: new Set(), Radar: new Set() };
 
-            PRODUTOS.forEach(p => {
+            // Loop único otimizado para extração de dados
+            const len = PRODUTOS.length;
+            for (let i = 0; i < len; i++) {
+                const p = PRODUTOS[i];
+
                 // Mercado
                 if (p.Mercado && p.Mercado !== 'N/A') {
-                    p.Mercado.split(/[,;]/).forEach(v => tempValores.Mercado.add(v.trim()));
+                    if (p.Mercado.indexOf(',') !== -1 || p.Mercado.indexOf(';') !== -1) {
+                        p.Mercado.split(/[,;]/).forEach(v => tempValores.Mercado.add(v.trim()));
+                    } else {
+                        tempValores.Mercado.add(p.Mercado.trim());
+                    }
                 }
                 // Prateleira
                 if (p.Prateleira && p.Prateleira !== 'N/A') {
-                    p.Prateleira.split(/[,;]/).forEach(v => tempValores.Prateleira.add(v.trim()));
+                    if (p.Prateleira.indexOf(',') !== -1 || p.Prateleira.indexOf(';') !== -1) {
+                        p.Prateleira.split(/[,;]/).forEach(v => tempValores.Prateleira.add(v.trim()));
+                    } else {
+                        tempValores.Prateleira.add(p.Prateleira.trim());
+                    }
                 }
                 // Local
                 if (p.Local && p.Local !== 'N/A') {
-                    p.Local.split(/[,;]/).forEach(v => tempValores.Local.add(v.trim()));
+                    if (p.Local.indexOf(',') !== -1 || p.Local.indexOf(';') !== -1) {
+                        p.Local.split(/[,;]/).forEach(v => tempValores.Local.add(v.trim()));
+                    } else {
+                        tempValores.Local.add(p.Local.trim());
+                    }
                 }
                 // Aplicador
                 if (p.Aplicador && p.Aplicador !== 'N/A') {
-                    p.Aplicador.split(/[,;]/).forEach(v => tempValores.Aplicador.add(v.trim()));
+                    if (p.Aplicador.indexOf(',') !== -1 || p.Aplicador.indexOf(';') !== -1) {
+                        p.Aplicador.split(/[,;]/).forEach(v => tempValores.Aplicador.add(v.trim()));
+                    } else {
+                        tempValores.Aplicador.add(p.Aplicador.trim());
+                    }
                 }
                 // Cor
                 if (p.Cor && p.Cor !== 'N/A') {
-                    if (p.Cor.includes('/')) {
-                        p.Cor.split('/').forEach(v => tempValores.Cor.add(v.trim().toUpperCase()));
+                    const c = p.Cor.toUpperCase();
+                    if (c.indexOf('/') !== -1) {
+                        c.split('/').forEach(v => tempValores.Cor.add(v.trim()));
                     } else {
-                        tempValores.Cor.add(p.Cor.trim().toUpperCase());
+                        tempValores.Cor.add(c.trim());
                     }
                 }
                 // Radar (MÁQUINAS)
                 if (p.Radar && p.Radar !== 'N/A' && p.Radar !== '-') {
                     tempValores.Radar.add(p.Radar.trim());
                 }
-            });
-
-            // Adiciona TODOS os aplicadores do sistema (incluindo os sem máquina atribuída)
-            if (DADOS_APLICADORES && Object.keys(DADOS_APLICADORES).length > 0) {
-                Object.keys(DADOS_APLICADORES).forEach(codigo => {
-                    if (codigo && codigo.trim()) tempValores.Aplicador.add(codigo.trim());
-                });
             }
 
-            // Adiciona máquinas cadastradas ao filtro de Radar
-            if (MAQUINAS && MAQUINAS.length > 0) {
+            // Injeção de dados externos (Aplicadores da Geolocation e Máquinas)
+            if (DADOS_APLICADORES) {
+                for (let key in DADOS_APLICADORES) {
+                    if (key && key.trim()) tempValores.Aplicador.add(key.trim());
+                }
+            }
+
+            if (MAQUINAS) {
                 MAQUINAS.forEach(m => {
                     const tag = (typeof m === 'object') ? m.tag_maq : m;
                     if (tag) tempValores.Radar.add(tag.trim());
                 });
             }
 
-            // Ordena alfabeticamente
+            // Ordenação e congelamento do estado
             VALORES_FILTROS = {
                 Mercado: Array.from(tempValores.Mercado).sort(),
                 Prateleira: Array.from(tempValores.Prateleira).sort(),
@@ -5055,7 +5154,9 @@
             };
 
             PRATELEIRAS_UNICAS = VALORES_FILTROS.Prateleira;
+            console.log(`[Perf] extrairValoresUnicos: ${(performance.now() - start).toFixed(2)}ms`);
         }
+
 
         window.toggleMultiSelect = function (id) {
             const options = document.getElementById(id);
@@ -5521,7 +5622,12 @@
 
                     // Atualiza Filtros Dinâmicos apenas se os produtos mudaram
                     extrairValoresUnicos();
-                    preencherSelectsFiltros();
+
+                    if (window.requestIdleCallback) {
+                        requestIdleCallback(() => preencherSelectsFiltros());
+                    } else {
+                        setTimeout(preencherSelectsFiltros, 50);
+                    }
 
                     // Salva Cache Local
                     localStorage.setItem('CACHE_PRODUTOS', JSON.stringify(PRODUTOS));
@@ -5743,6 +5849,14 @@
             applyFilters();
         }
         function renderResults(results, term, type, isAutoRefresh = false, isLoading = false) {
+            // [NEW] ZERO DOM CHURN (Eryzion Quality)
+            // Gera um fingerprint rápido dos resultados para evitar re-renderizar o que é idêntico
+            const fingerprint = isLoading ? 'loading' : results.slice(0, 10).map(p => `${p.CPD}|${p.temp_prat || ''}|${p.temp_local || ''}`).join(';');
+            if (!isLoading && fingerprint === window._lastRenderFingerprint && !isAutoRefresh) {
+                return; // Dados idênticos, pula renderização pesada
+            }
+            window._lastRenderRenderFingerprint = fingerprint;
+
             // [NEW] SKELETON LOADING (Eryzion Rule 1)
             if (isLoading) {
                 el.resultado.innerHTML = '';
@@ -5758,7 +5872,7 @@
                 return;
             }
             RESULTADOS_ATUAIS = results;
-            window._lastDataFingerprint = results.map(p => `${p.CPD}|${p.temp_prat || ''}|${p.temp_local || ''}|${p.Prateleira || ''}|${p.Local || ''}|${p.Radar || ''}`).join(';;');
+            window._lastDataFingerprint = results.length > 0 ? results.map(p => `${p.CPD}|${p.temp_prat || ''}|${p.temp_local || ''}|${p.Prateleira || ''}|${p.Local || ''}|${p.Radar || ''}`).join(';;') : '';
 
             el.exportContainer.style.display = results.length > 0 ? 'flex' : 'none';
 
@@ -6500,7 +6614,7 @@
                             <div class="qr-electric-border"></div>
                             <div class="qr-card-container">
                                 <div class="qr-white-wrapper">
-                                    <img src="${qrUrl}" style="width:160px; height:160px; display:block;" alt="QR">
+                                    <img src="${qrUrl}" style="width:160px; height:160px; display:block;" alt="QR" loading="lazy">
                                 </div>
                             </div>
                         </div>
@@ -6558,17 +6672,27 @@
             isCompassActive: false,
             compassBearing: 0,
             zoomLevel: 1.8,
+            followZoom: 3.2,
             svgWidth: 370,
             svgHeight: 220,
+            watchId: null,
+            startPos: null,
+            currentProgress: 0,
 
-            init: function(destShelfName) {
+            init: function (destShelfName) {
                 this.currentDest = `CABOS - ${destShelfName}`;
+                this.currentProgress = 0;
+                this.startPos = null;
+
                 this.drawBaseMap();
                 this.updateLabels();
                 this.checkContext();
+
+                // Reset state
+                this.stopCompass();
             },
 
-            checkContext: function() {
+            checkContext: function () {
                 // Se estiver dentro de um Iframe (Google Sites), mostra o botão de ejeção
                 const isIframe = window.self !== window.top;
                 const btnFull = document.getElementById('btnGPSFullscreen');
@@ -6577,36 +6701,62 @@
                 }
             },
 
-            goFullscreen: function() {
+            goFullscreen: function () {
                 window.open(window.location.href, '_blank');
             },
 
             syncCamera: function () {
                 const svgEl = document.querySelector('#wayfinderMap svg');
-                if (!svgEl || !this.isCompassActive) return;
+                if (!svgEl) return;
 
-                const originShelfKey = document.getElementById('wayfinderUserLoc').value;
-                if (!originShelfKey) return;
+                const originLabel = document.getElementById('wayfinderUserLoc').value;
+                if (!originLabel && !this.isCompassActive) {
+                    svgEl.style.transform = `scale(1) translate(0,0) rotate(0deg)`;
+                    return;
+                }
 
+                const originShelfKey = `CABOS - ${originLabel}`;
                 const pos = this.MAPA_PRATELEIRAS[originShelfKey];
-                if (!pos) return;
 
-                // Coordenadas reais no SVG (baseadas em drawBaseMap)
+                // Se não tiver posição, apenas reseta
+                if (!pos) {
+                    svgEl.style.transform = `scale(1) translate(0,0) rotate(0deg)`;
+                    return;
+                }
+
+                // Coordenadas reais no SVG
                 const colWidth = 30;
                 const userX = pos.x * colWidth + (colWidth / 2) + 3;
-                const userY = (pos.y === 0) ? 95 : 195; // Centro dos corredores de acesso
 
-                // Centro do Viewbox
-                const centerX = this.svgWidth / 2;
-                const centerY = this.svgHeight / 2;
+                // Determina Y baseado se é verso ou não
+                let userY;
+                if (pos.isVerso) {
+                    userY = 107; // Central
+                } else {
+                    userY = (pos.y === 0) ? 95 : 195;
+                }
 
-                // Cálculo do deslocamento para centralizar
-                const dx = centerX - userX;
-                const dy = centerY - userY;
+                if (this.isCompassActive) {
+                    // MODO FOLLOW: Zoom alto, centralizado no usuário e rotacionado
+                    const centerX = this.svgWidth / 2;
+                    const centerY = this.svgHeight / 2;
 
-                // Aplica Transformação Combinada: Centralização -> Zoom -> Rotação
-                // Offset de 90deg para alinhar o Norte à esquerda do SVG
-                svgEl.style.transform = `scale(${this.zoomLevel}) translate(${dx}px, ${dy}px) rotate(${-this.compassBearing + 90}deg)`;
+                    // Deslocamento para colocar o usuário no centro
+                    const dx = centerX - userX;
+                    const dy = centerY - userY;
+
+                    // Aplica: ZOOM -> ROTAÇÃO -> TRANSLATION
+                    // Usamos transform-origin no centro do SVG para a rotação ser natural
+                    svgEl.style.transformOrigin = `${userX}px ${userY}px`;
+                    svgEl.style.transform = `scale(${this.followZoom}) translate(${dx}px, ${dy}px) rotate(${-this.compassBearing}deg)`;
+
+                    document.querySelector('.hud-point.origin').classList.add('pulse');
+                } else {
+                    // MODO ESTÁTICO: Apenas centraliza sem rotação ou zoom excessivo
+                    svgEl.style.transformOrigin = `center center`;
+                    svgEl.style.transform = `scale(1) translate(0,0) rotate(0deg)`;
+                    document.querySelector('.hud-point.origin').classList.remove('pulse');
+                }
             },
 
             ensurePermissions: function (callback) {
@@ -6625,12 +6775,12 @@
                     },
                     (err) => {
                         console.warn("Localização negada ou erro:", err);
-                        
+
                         let msg = "Acesso à localização negado. O GPS funcionará em modo manual.";
                         if (window.self !== window.top) {
                             msg = "Sensores bloqueados pelo Google Sites. Use o botão 'GPS TELA CHEIA'.";
                         }
-                        
+
                         showToast(msg, "warning");
                         callback();
                     },
@@ -6678,11 +6828,90 @@
                 }
 
                 window.addEventListener('deviceorientation', this.handleOrientation.bind(this), true);
-                showToast("🛰️ Modo GPS Ativado!", "success");
+
+                // Inicia Rastreamento de Movimento Real
+                this.startTracking();
+
+                showToast("🛰️ Modo Navegação Ativado!", "success");
+            },
+
+            startTracking: function () {
+                if (!navigator.geolocation) return;
+
+                this.watchId = navigator.geolocation.watchPosition(
+                    (pos) => {
+                        const { latitude, longitude, accuracy } = pos.coords;
+                        console.log(`GPS: ${latitude}, ${longitude} accuracy: ${accuracy}`);
+
+                        if (!this.startPos) {
+                            this.startPos = { lat: latitude, lon: longitude };
+                            return;
+                        }
+
+                        // Calcula distância percorrida desde o início (em metros aprox)
+                        const dist = this.calculateDistance(this.startPos.lat, this.startPos.lon, latitude, longitude);
+
+                        // Mapeia 30 metros de caminhada = 100% da rota interna
+                        // (Ajustável conforme o tamanho real do galpão)
+                        const walkScale = 30;
+                        this.currentProgress = Math.min(0.98, dist / walkScale);
+
+                        this.updateMarkerOnPath();
+                    },
+                    (err) => console.warn("Erro GPS Tracking:", err),
+                    { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
+                );
+            },
+
+            calculateDistance: function (lat1, lon1, lat2, lon2) {
+                const R = 6371e3; // Metros
+                const f1 = lat1 * Math.PI / 180;
+                const f2 = lat2 * Math.PI / 180;
+                const df = (lat2 - lat1) * Math.PI / 180;
+                const dl = (lon2 - lon1) * Math.PI / 180;
+                const a = Math.sin(df / 2) * Math.sin(df / 2) +
+                    Math.cos(f1) * Math.cos(f2) *
+                    Math.sin(dl / 2) * Math.sin(dl / 2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                return R * c;
+            },
+
+            updateMarkerOnPath: function () {
+                const path = document.getElementById('routePath');
+                const marker = document.getElementById('userMarkerGroup');
+                if (!path || !marker) return;
+
+                const totalLength = path.getTotalLength();
+                const point = path.getPointAtLength(this.currentProgress * totalLength);
+
+                // Move o ícone suavizado
+                marker.setAttribute('transform', `translate(${point.x}, ${point.y})`);
+
+                // Sincroniza a câmera para seguir o novo ponto central
+                this.syncCameraAt(point.x, point.y);
+            },
+
+            syncCameraAt: function (x, y) {
+                const svgEl = document.querySelector('#wayfinderMap svg');
+                if (!svgEl || !this.isCompassActive) return;
+
+                const centerX = this.svgWidth / 2;
+                const centerY = this.svgHeight / 2;
+                const dx = centerX - x;
+                const dy = centerY - y;
+
+                svgEl.style.transformOrigin = `${x}px ${y}px`;
+                svgEl.style.transform = `scale(${this.followZoom}) translate(${dx}px, ${dy}px) rotate(${-this.compassBearing}deg)`;
             },
 
             stopCompass: function () {
                 this.isCompassActive = false;
+
+                if (this.watchId) {
+                    navigator.geolocation.clearWatch(this.watchId);
+                    this.watchId = null;
+                }
+
                 const btn = document.getElementById('btnGPSMode');
                 if (btn) {
                     btn.classList.remove('active');
@@ -6692,8 +6921,13 @@
 
                 // Reseta rotação e zoom
                 const svgWrap = document.querySelector('#wayfinderMap svg');
-                if (svgWrap) svgWrap.style.transform = `scale(1) translate(0,0) rotate(0deg)`;
-                showToast("Bússola Desativada", "info");
+                if (svgWrap) {
+                    svgWrap.style.transformOrigin = 'center center';
+                    svgWrap.style.transform = `scale(1) translate(0,0) rotate(0deg)`;
+                }
+
+                document.querySelector('.hud-point.origin').classList.remove('pulse');
+                showToast("Navegação Encerrada", "info");
             },
 
             handleOrientation: function (event) {
@@ -6709,7 +6943,20 @@
                 }
 
                 this.compassBearing = heading;
-                this.syncCamera();
+
+                // Se houver progresso na rota, sincroniza na posição atual do marcador
+                const marker = document.getElementById('userMarkerGroup');
+                if (marker) {
+                    const transform = marker.getAttribute('transform');
+                    const match = transform ? transform.match(/translate\(([^,]+),\s*([^)]+)\)/) : null;
+                    if (match) {
+                        this.syncCameraAt(parseFloat(match[1]), parseFloat(match[2]));
+                    } else {
+                        this.syncCamera(); // Fallback para a prateleira de origem
+                    }
+                } else {
+                    this.syncCamera();
+                }
             },
             // X: Coluna (0-11), Y: 0=Superior, 2=Inferior.
             MAPA_PRATELEIRAS: {
@@ -6876,13 +7123,14 @@
                 const pathContainer = document.getElementById('pathContainer');
                 pathContainer.innerHTML = `
                     <path d="${melhorPath.d}" class="wayfinder-path" id="routePath" marker-end="url(#wayfinderArrow)" />
-                    <!-- Marcador de Origem (Estilo GPS) -->
-                    <g transform="translate(${startX}, ${startBaseY})">
-                        <circle r="8" fill="rgba(168, 85, 247, 0.2)" />
-                        <path d="M-5,4 L0,-7 L5,4 L0,2 Z" class="gps-cursor-pointer" />
+                    <!-- Marcador de Origem (Estilo GPS dinâmico) -->
+                    <g transform="translate(${startX}, ${startBaseY})" id="userMarkerGroup">
+                        <circle r="15" class="gps-pulse-circle" />
+                        <circle r="8" fill="rgba(168, 85, 247, 0.2)" stroke="#a855f7" stroke-width="1" />
+                        <path d="M-5,4 L0,-7 L5,4 L0,2 Z" class="gps-cursor-pointer" id="userHeadingArrow" />
                     </g>
                     <!-- Marcador de Destino -->
-                    <circle cx="${melhorPath.endX}" cy="${melhorPath.endBaseY}" r="4.5" fill="#00ff41" class="wayfinder-marker" />
+                    <circle cx="${melhorPath.endX}" cy="${melhorPath.endBaseY}" r="6" fill="#00ff41" class="wayfinder-marker" />
                 `;
 
                 // Aplica labels ativos no mapa para as prateleiras envolvidas
@@ -7212,7 +7460,7 @@
         // Som de bip real (base64 de um seno de 1000Hz por 150ms)
         const SCAN_BEEP = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU9vT18Aqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq');
 
-        window.abrirScanner = async function() {
+        window.abrirScanner = async function () {
             const overlay = document.getElementById('modalScannerOverlay');
             overlay.classList.add('active');
             document.body.classList.add('modal-open');
@@ -7223,7 +7471,14 @@
 
             try {
                 scannerCameras = await Html5Qrcode.getCameras();
+                const camSelect = document.getElementById('cameraSelection');
+
                 if (scannerCameras && scannerCameras.length > 0) {
+                    // Preenche o menu de câmeras
+                    camSelect.innerHTML = scannerCameras.map((c, idx) =>
+                        `<option value="${c.id}">${c.label || 'Câmera ' + (idx + 1)}</option>`
+                    ).join('');
+
                     // Recupera câmera do cache ou define padrão
                     const lastCameraId = localStorage.getItem('LAST_CAMERA_ID');
                     let targetCameraId = lastCameraId;
@@ -7238,6 +7493,7 @@
                     }
 
                     targetCameraId = scannerCameras[currentCameraIndex].id;
+                    camSelect.value = targetCameraId; // Sincroniza o select
                     startScanner(targetCameraId);
                 } else {
                     alert("Nenhuma câmera encontrada neste dispositivo.");
@@ -7259,28 +7515,37 @@
 
             try {
                 await html5QrCode.start(
-                    cameraId, 
+                    cameraId,
                     config,
                     onScanSuccess,
                     undefined // Ignore errors to avoid console flood
                 );
                 localStorage.setItem('LAST_CAMERA_ID', cameraId);
-                
-                // Verifica suporte a Flash
-                const track = html5QrCode.getVideoTrack();
-                const capabilities = track.getCapabilities();
-                const flashBtn = document.getElementById('toggleFlashBtn');
-                if (capabilities.torch) {
-                    flashBtn.style.display = 'flex';
-                } else {
-                    flashBtn.style.display = 'none';
-                }
+
+                // Pequeno delay para garantir que o track esteja ativo para pegar as capabilities
+                setTimeout(() => {
+                    try {
+                        const track = html5QrCode.getVideoTrack();
+                        if (track) {
+                            const capabilities = track.getCapabilities();
+                            const flashBtn = document.getElementById('toggleFlashBtn');
+                            if (capabilities.torch) {
+                                flashBtn.style.display = 'flex';
+                            } else {
+                                flashBtn.style.display = 'none';
+                            }
+                        }
+                    } catch (e) {
+                        console.warn("Não foi possível ler as capacidades do flash:", e);
+                    }
+                }, 500);
+
             } catch (err) {
                 console.error("Erro ao iniciar scanner:", err);
             }
         }
 
-        window.fecharScanner = async function() {
+        window.fecharScanner = async function () {
             const overlay = document.getElementById('modalScannerOverlay');
             overlay.classList.remove('active');
             document.body.classList.remove('modal-open');
@@ -7295,38 +7560,47 @@
             if (flashBtn) flashBtn.classList.remove('active');
         };
 
-        window.toggleCamera = async function() {
-            if (scannerCameras.length < 2) return;
-            
+        window.trocarCameraPorMenu = async function (cameraId) {
+            if (!cameraId) return;
+
             if (html5QrCode && html5QrCode.isScanning) {
                 await html5QrCode.stop();
             }
 
-            currentCameraIndex = (currentCameraIndex + 1) % scannerCameras.length;
-            const nextCameraId = scannerCameras[currentCameraIndex].id;
-            startScanner(nextCameraId);
+            currentCameraIndex = scannerCameras.findIndex(c => c.id === cameraId);
+            startScanner(cameraId);
         };
 
-        window.toggleFlash = async function() {
+        window.toggleFlash = async function () {
             if (!html5QrCode || !html5QrCode.isScanning) return;
-            const track = html5QrCode.getVideoTrack();
-            if (!track) return;
 
             isFlashOn = !isFlashOn;
             try {
-                await track.applyConstraints({
+                // Usando o método applyVideoConstraints oficial da biblioteca
+                await html5QrCode.applyVideoConstraints({
                     advanced: [{ torch: isFlashOn }]
                 });
                 document.getElementById('toggleFlashBtn').classList.toggle('active', isFlashOn);
             } catch (e) {
-                console.warn("Flash não suportado ou erro ao ativar:", e);
-                isFlashOn = false;
+                console.warn("Flash não suportado ou erro ao ativar via applyVideoConstraints:", e);
+
+                // Fallback para aplicação direta no track caso o método da lib falhe
+                try {
+                    const track = html5QrCode.getVideoTrack();
+                    if (track) {
+                        await track.applyConstraints({ advanced: [{ torch: isFlashOn }] });
+                        document.getElementById('toggleFlashBtn').classList.toggle('active', isFlashOn);
+                    }
+                } catch (e2) {
+                    console.error("Ambas as tentativas de Flash falharam:", e2);
+                    isFlashOn = false;
+                }
             }
         };
 
         function onScanSuccess(decodedText) {
             if (navigator.vibrate) navigator.vibrate(120);
-            SCAN_BEEP.play().catch(() => {}); // Algumas políticas de browser podem bloquear áudio sem interação prévia
+            SCAN_BEEP.play().catch(() => { }); // Algumas políticas de browser podem bloquear áudio sem interação prévia
 
             // Processa o código encontrado
             el.input.value = decodedText.trim().replace(/^0+/, '');
@@ -7736,7 +8010,12 @@
 
                         // Renderiza imediatamente se houver algo no input (ou apenas prepara o estado)
                         extrairValoresUnicos();
-                        preencherSelectsFiltros();
+
+                        if (window.requestIdleCallback) {
+                            requestIdleCallback(() => preencherSelectsFiltros());
+                        } else {
+                            setTimeout(preencherSelectsFiltros, 50);
+                        }
 
                         // Nota: NÃO removemos o loader aqui (hideLoader) 
                         // pois o usuário quer ver o "Sincronizando" até a live sync (carregarDados) acabar.
@@ -7974,8 +8253,10 @@
 
                             <div style="flex-grow: 1;"></div>
 
-                            <button id="btnGPSFullscreen" class="btn-fullscreen" onclick="Wayfinder.goFullscreen()" title="Abrir em Nova Aba para Sensores">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <button id="btnGPSFullscreen" class="btn-fullscreen" onclick="Wayfinder.goFullscreen()"
+                                title="Abrir em Nova Aba para Sensores">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
                                     <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                                     <polyline points="15 3 21 3 21 9"></polyline>
                                     <line x1="10" y1="14" x2="21" y2="3"></line>
