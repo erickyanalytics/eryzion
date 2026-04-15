@@ -1717,7 +1717,7 @@
             height: 100% !important;
             padding: 0 !important;
             gap: 0 !important;
-            background: #000 !important;
+            background: #f8f9fa !important;
         }
 
         .wayfinder-svg-wrapper {
@@ -1725,7 +1725,7 @@
             height: 100%;
             border-radius: 0 !important;
             position: relative;
-            background: #000;
+            background: #f8f9fa;
         }
 
         /* HUD ITINERÁRIO FLUTUANTE */
@@ -1900,7 +1900,7 @@
             padding-bottom: 8px;
         }
 
-         /* Styles for QR Origin Scanner */
+        /* Styles for QR Origin Scanner */
         .origin-scanner-container {
             width: 100%;
             aspect-ratio: 1/1;
@@ -1936,8 +1936,15 @@
         }
 
         @keyframes qr-laser-move {
-            0%, 100% { top: 20%; }
-            50% { top: 80%; }
+
+            0%,
+            100% {
+                top: 20%;
+            }
+
+            50% {
+                top: 80%;
+            }
         }
 
         .origin-qr-overlay-text {
@@ -1952,7 +1959,7 @@
             text-transform: uppercase;
             letter-spacing: 2px;
             z-index: 10;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
             opacity: 0.8;
         }
 
@@ -1993,6 +2000,46 @@
             color: rgba(255, 255, 255, 0.3);
             font-size: 28px;
             cursor: pointer;
+        }
+
+        .manual-grid-scroll {
+            max-height: 40vh;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .manual-grid-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .manual-grid-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .manual-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .manual-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 15px 5px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .manual-btn:hover {
+            background: rgba(0, 255, 65, 0.1);
+            border-color: rgba(0, 255, 65, 0.4);
+            color: #00ff41;
+            transform: translateY(-2px);
         }
 
         .wayfinder-hud {
@@ -2083,34 +2130,76 @@
             left: 20px;
             top: calc(50% - 15px);
             transform: translateY(-50%) rotate(-67.5deg);
-            color: rgba(255, 68, 68, 0.4);
+            color: rgba(255, 68, 68, 0.6);
         }
 
         .cardinal-s {
             right: 20px;
             top: calc(50% + 15px);
             transform: translateY(-50%) rotate(112.5deg);
+            color: rgba(0, 0, 0, 0.4);
         }
 
         .cardinal-o {
             top: 15px;
             left: calc(50% + 15px);
             transform: translateX(-50%) rotate(22.5deg);
+            color: rgba(0, 0, 0, 0.4);
         }
 
         .cardinal-l {
             bottom: 15px;
             left: calc(50% - 15px);
             transform: translateX(-50%) rotate(22.5deg);
+            color: rgba(0, 0, 0, 0.4);
         }
 
         .wayfinder-svg-wrapper {
-            background: rgba(0, 0, 0, 0.4) !important;
-            border: 1px solid rgba(255, 255, 255, 0.05) !important;
-            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.5);
+            background: #f8f9fa !important;
+            border: 1px solid rgba(0, 0, 0, 0.05) !important;
+            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.05);
             overflow: hidden;
-            /* Importante para o modo câmera */
             position: relative;
+        }
+
+        .wayfinder-shelf {
+            fill: #111111;
+            stroke: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .wayfinder-shelf.highlight {
+            fill: #000000;
+            stroke: #00ff41;
+            stroke-width: 2;
+            filter: drop-shadow(0 0 15px rgba(0, 255, 65, 0.3));
+        }
+
+        .wayfinder-label {
+            fill: #ffffff;
+            font-size: 10px;
+            font-weight: 900;
+            font-family: 'Outfit', sans-serif;
+            pointer-events: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .wayfinder-label.active {
+            fill: #00ff41;
+            filter: drop-shadow(0 0 5px rgba(0, 255, 65, 0.5));
+        }
+
+        .wayfinder-dot-pattern {
+            fill: rgba(0, 0, 0, 0.1);
+        }
+
+        .wayfinder-path {
+            stroke: #00ff41;
+            stroke-width: 3.5;
+            fill: none;
+            stroke-dasharray: 12 6;
+            filter: drop-shadow(0 0 10px rgba(0, 255, 65, 0.4));
         }
 
         #wayfinderMap {
@@ -6913,14 +7002,12 @@
             currentDest: null,
             isCompassActive: false,
             compassBearing: 0,
-            zoomLevel: 1.0,
-            followZoom: 1.0,
             svgWidth: 370,
             svgHeight: 220,
-            headerOffset: 0,
             watchId: null,
             startPos: null,
             currentProgress: 0,
+            totalPathMeters: 11.5, // Dinâmico via updateRoute
 
             // Touch/Drag State
             isUserPanning: false,
@@ -6928,462 +7015,21 @@
             panY: 0,
             lastTouchX: 0,
             lastTouchY: 0,
-
-            // Recenter Timer
             _forceRecenterUntil: 0,
 
-            // Session Lock to prevent multiple geolocation prompts
-            _sessionGpsGranted: false,
+            // Pedometer State
+            stepsTaken: 0,
+            pedometerDist: 0,
+            lastStepTime: 0,
+            stepLength: 0.85, 
+            isMotionActive: false,
 
-            // State for Origin Scanner
+            // QR State
             originQrScanner: null,
             currentOriginCameraId: null,
             isOriginFlashOn: false,
 
-            init: function (destShelfName) {
-                this.currentDest = `CABOS - ${destShelfName}`;
-                this.currentProgress = 0;
-                this.startPos = null;
-                this.panX = 0;
-                this.panY = 0;
-                this.isUserPanning = false;
-
-                this.drawBaseMap();
-                this.updateLabels();
-                this.checkContext();
-                this.initTouchEvents();
-
-                // Reset state
-                this.stopCompass();
-            },
-
-            initTouchEvents: function () {
-                const container = document.getElementById('wayfinderMapContainer');
-                if (!container || container._hasTouchInited) return;
-
-                container.addEventListener('touchstart', (e) => {
-                    if (e.touches.length === 1) {
-                        this.isUserPanning = true;
-                        this.lastTouchX = e.touches[0].clientX;
-                        this.lastTouchY = e.touches[0].clientY;
-
-                        // Break the initial lock if the user touches the screen
-                        this._forceRecenterUntil = 0;
-
-                        const svg = document.querySelector('#wayfinderMap svg');
-                        if (svg) svg.style.transition = 'none';
-                    }
-                }, { passive: false });
-
-                container.addEventListener('touchmove', (e) => {
-                    if (this.isUserPanning && e.touches.length === 1) {
-                        e.preventDefault();
-                        const dx = e.touches[0].clientX - this.lastTouchX;
-                        const dy = e.touches[0].clientY - this.lastTouchY;
-
-                        this.panX += dx;
-                        this.panY += dy;
-
-                        this.lastTouchX = e.touches[0].clientX;
-                        this.lastTouchY = e.touches[0].clientY;
-
-                        this.syncCamera();
-                    }
-                }, { passive: false });
-
-                container.addEventListener('touchend', () => {
-                    this.isUserPanning = false;
-                    const svg = document.querySelector('#wayfinderMap svg');
-                    if (svg) svg.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-                });
-
-                container._hasTouchInited = true;
-            },
-
-            checkContext: function () {
-                // Se estiver dentro de um Iframe (Google Sites), mostra o botão de ejeção
-                const isIframe = window.self !== window.top;
-                const btnFull = document.getElementById('btnGPSFullscreen');
-                if (isIframe && btnFull) {
-                    btnFull.style.display = 'inline-flex';
-                }
-            },
-
-            goFullscreen: function () {
-                window.open(window.location.href, '_blank');
-            },
-
-            syncCamera: function (forceX, forceY) {
-                const svgEl = document.querySelector('#wayfinderMap svg');
-                const container = document.getElementById('wayfinderMapContainer');
-                if (!svgEl || !container) return;
-
-                let userX = forceX, userY = forceY;
-
-                // 1. Determinação de Coordenadas Lógicas
-                if (userX === undefined || userY === undefined) {
-                    const marker = document.getElementById('userMarkerGroup');
-                    if (marker) {
-                        const transform = marker.getAttribute('transform');
-                        const match = transform ? transform.match(/translate\(([^, ]+)[, ]+([^)]+)\)/) : null;
-                        if (match) {
-                            userX = parseFloat(match[1]);
-                            userY = parseFloat(match[2]);
-                        }
-                    }
-                }
-
-                // Fallback para Origem Manual
-                if (userX === undefined || userY === undefined) {
-                    const originLabel = document.getElementById('wayfinderUserLoc') ? document.getElementById('wayfinderUserLoc').value : null;
-                    if (originLabel) {
-                        const originShelfKey = `CABOS - ${originLabel}`;
-                        const pos = this.MAPA_PRATELEIRAS[originShelfKey];
-                        if (pos) {
-                            const colWidth = 30;
-                            userX = pos.x * colWidth + (colWidth / 2) + 3;
-                            userY = pos.isVerso ? 107 : (pos.y === 0 ? 95 : 195);
-                        }
-                    }
-                }
-
-                if (userX === undefined || userY === undefined) return;
-
-                // 2. Resolução Dinâmica (Pixels Físicos)
-                const rect = container.getBoundingClientRect();
-                const containerW = rect.width;
-                const containerH = rect.height;
-
-                const scaleX = containerW / this.svgWidth;
-                const scaleY = containerH / this.svgHeight;
-
-                const userX_px = userX * scaleX;
-                const userY_px = userY * scaleY;
-
-                // 3. Rotação Ancorada (Frente para Cima / Heading-Up)
-                // Offset Predial: Calibrado para alinhar com a estrutura da empresa (+22.5°)
-                const BUILDING_OFFSET = 22.5;
-                const bearing = this.isCompassActive ? (this.compassBearing + BUILDING_OFFSET) : 0;
-
-                // 4. Centralização (Trava de Câmera)
-                // Se GPS ativo, forçamos o ponto roxo no centro absoluto (Magnetic Focus)
-                const targetX = containerW / 2 + (this.isCompassActive ? 0 : this.panX);
-                const targetY = containerH / 2 + (this.isCompassActive ? 0 : this.panY);
-
-                const dx = targetX - userX_px;
-                const dy = targetY - userY_px;
-
-                // Transform Origin no ÍCONE ROXO para o mapa não "fugir" ao girar
-                svgEl.style.transformOrigin = `${userX_px}px ${userY_px}px`;
-                svgEl.style.transform = `translate(${dx}px, ${dy}px) scale(1) rotate(${-bearing}deg)`;
-
-                // 5. Giro do Ícone Roxo (Olhar para onde o celular aponta + Calibração 180°)
-                const arrow = document.getElementById('userHeadingArrow');
-                if (arrow) {
-                    // Rotaciona a seta para compensar o giro do mapa e apontar pro 'Topo' do celular
-                    arrow.setAttribute('transform', `rotate(${bearing})`);
-                }
-            },
-
-
-
-            startForceRecenter: function () {
-                this.panX = 0;
-                this.panY = 0;
-                this._forceRecenterUntil = Date.now() + 3000;
-
-                const recLoop = () => {
-                    if (Date.now() < this._forceRecenterUntil) {
-                        this.syncCamera();
-                        requestAnimationFrame(recLoop);
-                    }
-                };
-                recLoop();
-            },
-
-            ensurePermissions: function (callback) {
-                if (!navigator.geolocation) {
-                    showToast("GPS não suportado", "error");
-                    callback();
-                    return;
-                }
-
-                // Session Lock: Se já concedido nesta sessão, ignora qualquer prompt
-                if (this._sessionGpsGranted || localStorage.getItem('ERYZION_GPS_GRANTED') === 'true') {
-                    this._sessionGpsGranted = true;
-                    callback();
-                    return;
-                }
-
-                this.requestGeolocation(callback);
-            },
-
-            requestGeolocation: function (callback) {
-                if (this._requestingGps) return;
-                this._requestingGps = true;
-
-                showToast("🛰️ Sincronizando Localização...", "info");
-
-                navigator.geolocation.getCurrentPosition(
-                    (pos) => {
-                        this._sessionGpsGranted = true;
-                        localStorage.setItem('ERYZION_GPS_GRANTED', 'true');
-                        this._requestingGps = false;
-                        callback();
-                    },
-                    (err) => {
-                        console.warn("Erro GPS:", err);
-                        this._requestingGps = false;
-                        callback();
-                    },
-                    { enableHighAccuracy: true, timeout: 6000, maximumAge: 300000 } // Cache agressivo (5 min) para evitar re-prompts
-                );
-            },
-
-            toggleCompass: function () {
-                if (this.isCompassActive) {
-                    this.stopCompass();
-                } else {
-                    this.startCompass();
-                }
-            },
-
-            // GPS ORIGIN QR SCANNER ENGINE
-            startOriginScanner: function () {
-                if (this.originQrScanner) return;
-
-                const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-                this.originQrScanner = new Html5Qrcode("origin-reader");
-
-                Html5Qrcode.getCameras().then(devices => {
-                    if (devices && devices.length > 0) {
-                        const backCamera = devices.find(d => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('traseira')) || devices[devices.length - 1];
-                        this.currentOriginCameraId = backCamera.id;
-                        this.originQrScanner.start(
-                            this.currentOriginCameraId,
-                            config,
-                            (text) => this.processQrResult(text)
-                        ).catch(err => {
-                            console.error("Scanner Error:", err);
-                            showToast("Erro ao abrir câmera", "error");
-                        });
-                    } else {
-                        showToast("Câmera não encontrada", "warning");
-                    }
-                }).catch(err => {
-                    console.error("Camera Access Error:", err);
-                    showToast("Permissão de câmera negada", "error");
-                });
-            },
-
-            stopOriginScanner: function () {
-                if (this.originQrScanner) {
-                    this.originQrScanner.stop().then(() => {
-                        this.originQrScanner = null;
-                        this.isOriginFlashOn = false;
-                    }).catch(err => {
-                        // Silently stop if already cleared
-                        this.originQrScanner = null;
-                    });
-                }
-            },
-
-            processQrResult: function (text) {
-                if (!text) return;
-
-                // Formato: F, G, FV, GV...
-                let shelf = text.toUpperCase().trim();
-                if (shelf.length < 1) return;
-
-                let cleanLabel = shelf[0]; // Primeira letra
-                let isVerso = shelf.includes('V');
-
-                let targetLabel = isVerso ? `${cleanLabel}-VERSO` : cleanLabel;
-
-                // Feedback
-                if ('vibrate' in navigator) navigator.vibrate(100);
-                showToast(`📍 Origem: ${targetLabel}`, "success");
-
-                this.stopOriginScanner();
-                selecionarOrigemRapida(targetLabel);
-            },
-
-            switchOriginCamera: function () {
-                if (!this.originQrScanner) return;
-                Html5Qrcode.getCameras().then(devices => {
-                    if (devices.length > 1) {
-                        const currentIndex = devices.findIndex(d => d.id === this.currentOriginCameraId);
-                        const nextIndex = (currentIndex + 1) % devices.length;
-                        this.currentOriginCameraId = devices[nextIndex].id;
-                        this.stopOriginScanner();
-                        setTimeout(() => this.startOriginScanner(), 400);
-                    }
-                });
-            },
-
-            toggleOriginFlash: function () {
-                if (this.originQrScanner) {
-                    this.isOriginFlashOn = !this.isOriginFlashOn;
-                    this.originQrScanner.applyVideoConstraints({
-                        advanced: [{ torch: this.isOriginFlashOn }]
-                    }).catch(err => {
-                        showToast("Flash indisponível", "warning");
-                    });
-                }
-            },
-
-            startCompass: function () {
-                const btn = document.getElementById('btnCompassToggle');
-
-                // Pedir permissão no iOS
-                if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                    // Cache de Bússola para iOS (Sticky Session)
-                    if (sessionStorage.getItem('ERYZION_COMPASS_GRANTED') === 'true') {
-                        this.activateCompassListener();
-                        return;
-                    }
-
-                    DeviceOrientationEvent.requestPermission()
-                        .then(response => {
-                            if (response === 'granted') {
-                                sessionStorage.setItem('ERYZION_COMPASS_GRANTED', 'true');
-                                this.activateCompassListener();
-                            } else {
-                                showToast("Permissão de Bússola negada", "error");
-                            }
-                        })
-                        .catch(err => {
-                            console.error(err);
-                        });
-                } else {
-                    // Android ou desktop
-                    this.activateCompassListener();
-                }
-            },
-
-            activateCompassListener: function () {
-                this.isCompassActive = true;
-                const btn = document.getElementById('btnGPSMode');
-                if (btn) {
-                    btn.classList.add('active');
-                    btn.innerHTML = `
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="width:18px;height:18px;">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="currentColor"></polygon>
-                        </svg>
-                        <span>GPS ATIVO</span>`;
-                }
-
-                window.removeEventListener('deviceorientation', this.handleOrientation.bind(this), true);
-                window.addEventListener('deviceorientation', this.handleOrientation.bind(this), true);
-                this.startTracking();
-
-                showToast("🚀 GPS Ativado", "success");
-            },
-
-            startTracking: function () {
-                if (!navigator.geolocation || this.watchId) return;
-
-                this.watchId = navigator.geolocation.watchPosition(
-                    (pos) => {
-                        const { latitude, longitude, accuracy } = pos.coords;
-                        console.log(`GPS: ${latitude}, ${longitude} accuracy: ${accuracy}`);
-
-                        // Descarta pontos com precisão ruim (> 200m) para evitar pulos no mapa
-                        if (accuracy > 200) {
-                            console.warn("GPS ignorado devido a baixa precisão.");
-                            return;
-                        }
-
-                        if (!this.startPos) {
-                            this.startPos = { lat: latitude, lon: longitude };
-                            return;
-                        }
-
-                        // Calcula distância percorrida desde o início (em metros aprox)
-                        const dist = this.calculateDistance(this.startPos.lat, this.startPos.lon, latitude, longitude);
-
-                        // Calibração de Campo: 11 prateleiras reais = 4 virtuais (Ratio 2.75x)
-                        // Mapeia ~11 metros de caminhada = 100% da rota interna
-                        const walkScale = 11;
-                        this.currentProgress = Math.min(0.98, dist / walkScale);
-
-                        this.updateMarkerOnPath();
-                    },
-                    (err) => console.warn("Erro GPS Tracking:", err),
-                    { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
-                );
-            },
-
-            calculateDistance: function (lat1, lon1, lat2, lon2) {
-                const R = 6371e3; // Metros
-                const f1 = lat1 * Math.PI / 180;
-                const f2 = lat2 * Math.PI / 180;
-                const df = (lat2 - lat1) * Math.PI / 180;
-                const dl = (lon2 - lon1) * Math.PI / 180;
-                const a = Math.sin(df / 2) * Math.sin(df / 2) +
-                    Math.cos(f1) * Math.cos(f2) *
-                    Math.sin(dl / 2) * Math.sin(dl / 2);
-                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-                return R * c;
-            },
-
-            updateMarkerOnPath: function () {
-                const path = document.getElementById('routePath');
-                const marker = document.getElementById('userMarkerGroup');
-                if (!path || !marker) return;
-
-                const totalLength = path.getTotalLength();
-                const point = path.getPointAtLength(this.currentProgress * totalLength);
-
-                // Move o ícone (o syncCamera cuidará da rotação logo em seguida)
-                marker.setAttribute('transform', `translate(${point.x}, ${point.y})`);
-
-                this.syncCamera(point.x, point.y);
-            },
-
-            stopCompass: function () {
-                this.isCompassActive = false;
-
-                if (this.watchId) {
-                    navigator.geolocation.clearWatch(this.watchId);
-                    this.watchId = null;
-                }
-
-                const btn = document.getElementById('btnGPSMode');
-                if (btn) {
-                    btn.classList.remove('active');
-                    btn.querySelector('span').innerText = "MODO GPS";
-                }
-                window.removeEventListener('deviceorientation', this.handleOrientation.bind(this), true);
-
-                // Reseta rotação e zoom
-                const svgWrap = document.querySelector('#wayfinderMap svg');
-                if (svgWrap) {
-                    svgWrap.style.transformOrigin = 'center center';
-                    svgWrap.style.transform = `scale(1) translate(0,0) rotate(0deg)`;
-                }
-
-                document.querySelector('.hud-point.origin').classList.remove('pulse');
-                showToast("Navegação Encerrada", "info");
-            },
-
-            handleOrientation: function (event) {
-                if (!this.isCompassActive) return;
-
-                let heading = 0;
-                if (event.webkitCompassHeading) {
-                    heading = event.webkitCompassHeading;
-                } else if (event.alpha !== null) {
-                    heading = 360 - event.alpha;
-                }
-
-                this.compassBearing = heading;
-                this.syncCamera(); // Agora o syncCamera cuida da rotação ancorada e centralização
-            },
-            // X: Coluna (0-11), Y: 0=Superior, 2=Inferior.
             MAPA_PRATELEIRAS: {
-                // Linha Inferior (A-K)
                 'CABOS - A': { x: 0, y: 2 }, 'CABOS - A-VERSO': { x: 0, y: 2, isVerso: true },
                 'CABOS - B': { x: 1, y: 2 }, 'CABOS - B-VERSO': { x: 1, y: 2, isVerso: true },
                 'CABOS - C': { x: 3, y: 2 }, 'CABOS - C-VERSO': { x: 3, y: 2, isVerso: true },
@@ -7395,7 +7041,6 @@
                 'CABOS - I': { x: 9, y: 2 }, 'CABOS - I-VERSO': { x: 9, y: 2, isVerso: true },
                 'CABOS - J': { x: 10, y: 2 }, 'CABOS - J-VERSO': { x: 10, y: 2, isVerso: true },
                 'CABOS - K': { x: 11, y: 2 }, 'CABOS - K-VERSO': { x: 11, y: 2, isVerso: true },
-                // Linha Superior (M-O)
                 'CABOS - M': { x: 0, y: 0 }, 'CABOS - M-VERSO': { x: 0, y: 0, isVerso: true },
                 'CABOS - L': { x: 1, y: 0 }, 'CABOS - L-VERSO': { x: 1, y: 0, isVerso: true },
                 'CABOS - N': { x: 5, y: 0 }, 'CABOS - N-VERSO': { x: 5, y: 0, isVerso: true },
@@ -7403,189 +7048,316 @@
             },
 
             init: function (shelfDestName) {
-                this.currentDest = shelfDestName;
+                this.currentDest = shelfDestName.startsWith('CABOS') ? shelfDestName : `CABOS - ${shelfDestName}`;
+                this.currentProgress = 0;
+                this.stepsTaken = 0;
+                this.pedometerDist = 0;
+                this.lastStepTime = 0;
+                this.startPos = null;
+                this.panX = 0;
+                this.panY = 0;
+                this.isUserPanning = false;
+
                 this.drawBaseMap();
+                this.initTouchEvents();
+                this.checkContext();
 
                 const select = document.getElementById('wayfinderUserLoc');
                 if (select) select.value = '';
 
                 const destBadge = document.getElementById('wayfinderDestBadge');
-                if (destBadge) destBadge.textContent = shelfDestName || '?';
+                if (destBadge) destBadge.textContent = shelfDestName.replace('CABOS - ', '') || '?';
 
                 const originBadge = document.getElementById('wayfinderOriginBadge');
                 if (originBadge) originBadge.textContent = '?';
 
-                // Ativa modo GPS automaticamente para máxima precisão imediata
-                setTimeout(() => {
-                    this.activateCompassListener();
-                }, 100);
+                setTimeout(() => this.startCompass(), 100);
             },
 
             drawBaseMap: function () {
                 const wrapper = document.getElementById('wayfinderMap');
                 if (!wrapper) return;
-
                 const colWidth = 30;
                 const totalWidth = 370;
                 const totalHeight = 220;
 
                 let svg = `<svg viewBox="0 0 ${totalWidth} ${totalHeight}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">`;
-
-                // Padrão de Pontos e Marcadores (HUD Dots e Arrow)
                 svg += `<defs>
                     <pattern id="dotPattern" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
-                        <circle cx="2" cy="2" r="0.5" class="wayfinder-dot-pattern" />
+                        <circle cx="2" cy="2" r="0.5" fill="rgba(255,255,255,0.05)" />
                     </pattern>
                     <marker id="wayfinderArrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto" markerUnits="strokeWidth">
-                        <path d="M0,0 L6,3 L0,6 L1.5,3 Z" fill="#00ff41" />
+                        <path d="M0,0 L6,3 L0,6 L1.5,3 Z" fill="#10b981" />
                     </marker>
                 </defs>`;
                 svg += `<rect width="100%" height="100%" fill="url(#dotPattern)" />`;
 
-                // Desenhar Prateleiras (Apenas Retângulos Puros)
                 Object.entries(this.MAPA_PRATELEIRAS).forEach(([name, pos]) => {
                     if (pos.isVerso) return;
-
                     const x = pos.x * colWidth + 5;
                     const y = (pos.y === 0) ? 35 : 130;
                     const isDest = (name === this.currentDest);
                     const label = name.replace('CABOS - ', '');
-
                     svg += `
                         <g id="shelf-${label}">
                             <rect x="${x}" y="${y}" width="${colWidth - 4}" height="50" 
-                                  class="wayfinder-shelf ${isDest ? 'highlight' : ''}" rx="4" />
+                                  class="wayfinder-shelf ${isDest ? 'highlight' : ''}" rx="6" />
                             <text x="${x + (colWidth / 2) - 1.5}" y="${y + 25}" 
                                   class="wayfinder-label ${isDest ? 'active' : ''}" text-anchor="middle" dy=".3em">${label}</text>
                         </g>
                     `;
                 });
-
-                svg += `<g id="pathContainer"></g>`;
-                svg += `</svg>`;
-
+                svg += `<g id="pathContainer"></g></svg>`;
                 wrapper.innerHTML = svg;
             },
 
             updateRoute: function () {
                 const originLabel = document.getElementById('wayfinderUserLoc').value;
                 if (!originLabel) return;
-
                 const originShelfKey = `CABOS - ${originLabel}`;
                 const destShelfKey = this.currentDest;
-
                 const originPos = this.MAPA_PRATELEIRAS[originShelfKey];
                 const destPos = this.MAPA_PRATELEIRAS[destShelfKey];
-
                 if (!originPos || !destPos) return;
 
                 document.getElementById('wayfinderOriginBadge').textContent = `SUA POSIÇÃO: ${originLabel}`;
-
                 const colWidth = 30;
+                const SUPERIOR_Y = 92, CENTRAL_Y = 107, INFERIOR_Y = 194;
+                let startY, startX = originPos.x * colWidth + (colWidth / 2) + 3;
+                if (originPos.isVerso) startY = CENTRAL_Y;
+                else startY = (originPos.y === 0) ? SUPERIOR_Y : INFERIOR_Y;
 
-                const SUPERIOR_Y = 92; // Corredor Superior (M-O)
-                const CENTRAL_Y = 107; // Travessia Central
-                const INFERIOR_Y = 194; // Corredor Inferior (A-K)
-
-                // 1. Determina corredor e coordenadas da ORIGEM
-                let startY, startX = originPos.x * colWidth + (colWidth / 2) + 3, startBaseY;
-                if (originPos.isVerso) {
-                    startY = CENTRAL_Y;
-                    startBaseY = 130; 
-                } else {
-                    startY = (originPos.y === 0) ? SUPERIOR_Y : INFERIOR_Y;
-                    startBaseY = (originPos.y === 0) ? 85 : 180; 
-                }
-
-                // 2. Determina possíveis pontos de DESTINO (Frente e Verso)
                 const opcoesDestino = [];
-                // Opção Frente (Sempre existe)
-                opcoesDestino.push({
-                    y: (destPos.y === 0) ? SUPERIOR_Y : INFERIOR_Y,
-                    baseY: (destPos.y === 0) ? 85 : 180
-                });
-                // Opção Verso (Apenas para fileira A-K)
-                if (destPos.y !== 0) {
-                    opcoesDestino.push({
-                        y: CENTRAL_Y,
-                        baseY: 130
-                    });
-                }
+                opcoesDestino.push({ y: (destPos.y === 0) ? SUPERIOR_Y : INFERIOR_Y });
+                if (destPos.y !== 0) opcoesDestino.push({ y: CENTRAL_Y });
 
-                // 3. Calcula a melhor trajetória entre todas as opções
-                let melhorPath = { d: "", len: Infinity, endX: 0, endBaseY: 0 };
+                let melhorPath = { d: "", len: Infinity, endX: 0, endY: 0 };
                 const pontosX = [2 * colWidth + 15, 11 * colWidth + 45];
                 const endX = destPos.x * colWidth + (colWidth / 2) + 3;
 
                 opcoesDestino.forEach(opt => {
                     let d_temp = `M ${startX} ${startY}`;
                     let currentLen = 0;
-
                     if (startY === opt.y) {
-                        // Mesmo corredor: Reta direta
                         d_temp += ` L ${endX} ${opt.y}`;
                         currentLen += Math.abs(endX - startX);
                     } else {
-                        // Corredores diferentes: Precisa de travessia
-                        let bestTX = pontosX[0];
-                        let minTxDist = Infinity;
+                        let bestTX = pontosX[0], minTxDist = Infinity;
                         pontosX.forEach(px => {
                             let txDist = Math.abs(startX - px) + Math.abs(endX - px);
-                            if (txDist < minTxDist) {
-                                minTxDist = txDist;
-                                bestTX = px;
-                            }
+                            if (txDist < minTxDist) { minTxDist = txDist; bestTX = px; }
                         });
                         d_temp += ` L ${bestTX} ${startY} L ${bestTX} ${opt.y} L ${endX} ${opt.y}`;
                         currentLen += minTxDist + Math.abs(opt.y - startY);
                     }
-
-                    if (currentLen < melhorPath.len) {
-                        melhorPath = { d: d_temp, len: currentLen, endX: endX, endBaseY: opt.y };
-                    }
+                    if (currentLen < melhorPath.len) melhorPath = { d: d_temp, len: currentLen, endX: endX, endY: opt.y };
                 });
 
-                // Injeta o trajeto e marcadores com estilo HUD
+                const PIXELS_PER_METER = 30 / 1.35;
+                this.totalPathMeters = melhorPath.len / PIXELS_PER_METER;
+
                 const pathContainer = document.getElementById('pathContainer');
                 pathContainer.innerHTML = `
                     <path d="${melhorPath.d}" class="wayfinder-path" id="routePath" marker-end="url(#wayfinderArrow)" />
-                    <!-- Marcador de Origem (Estilo GPS dinâmico) -->
                     <g transform="translate(${startX}, ${startY})" id="userMarkerGroup">
-                        <circle r="15" class="gps-pulse-circle" />
-                        <circle r="8" fill="rgba(168, 85, 247, 0.2)" stroke="#a855f7" stroke-width="1" />
-                        <path d="M-5,4 L0,-7 L5,4 L0,2 Z" class="gps-cursor-pointer" id="userHeadingArrow" />
+                        <circle r="18" class="gps-pulse-circle" />
+                        <circle r="8" fill="rgba(168, 85, 247, 0.2)" stroke="#a855f7" stroke-width="2" id="userMarkerInner" />
+                        <path d="M-5,4 L0,-8 L5,4 L0,2 Z" class="gps-cursor-pointer" id="userHeadingArrow" />
                     </g>
-                    <!-- Marcador de Destino -->
-                    <circle cx="${melhorPath.endX}" cy="${melhorPath.endBaseY}" r="6" fill="#00ff41" class="wayfinder-marker" />
+                    <circle cx="${melhorPath.endX}" cy="${melhorPath.endY}" r="6" fill="#10b981" class="wayfinder-marker" />
                 `;
 
-                // Aplica labels ativos no mapa para as prateleiras envolvidas
-                document.querySelectorAll('.wayfinder-label').forEach(lbl => lbl.classList.remove('active'));
-                const originCleanLabel = originShelfKey.replace('CABOS - ', '').replace('-VERSO', '');
-                const destLabel = destShelfKey.replace('CABOS - ', '');
-
-                const originShelfLabelEl = document.querySelector(`#shelf-${originCleanLabel} .wayfinder-label`);
-                const destShelfLabelEl = document.querySelector(`#shelf-${destLabel} .wayfinder-label`);
-                if (originShelfLabelEl) originShelfLabelEl.classList.add('active');
-                if (destShelfLabelEl) destShelfLabelEl.classList.add('active');
-
-                // Animação do Path
                 const pathEl = document.getElementById('routePath');
                 if (pathEl) {
                     const len = pathEl.getTotalLength();
                     pathEl.style.strokeDasharray = len;
                     pathEl.style.strokeDashoffset = len;
                     pathEl.getBoundingClientRect();
-                    pathEl.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1)';
+                    pathEl.style.transition = 'stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1)';
                     pathEl.style.strokeDashoffset = '0';
-                    setTimeout(() => { pathEl.style.strokeDasharray = "10, 5"; }, 1200);
+                    setTimeout(() => { pathEl.style.strokeDasharray = "10, 5"; }, 1500);
                 }
+                this.syncCamera(); this.startForceRecenter();
+            },
 
-                // Sincroniza câmera após atualizar rota (Centraliza na origem ou usuário)
+            updateProgressAndMarker: function () {
+                const gpsContribution = this.gpsDist || 0;
+                const stepContribution = this.pedometerDist || 0;
+                let effectiveDist = stepContribution;
+                if (Math.abs(gpsContribution - stepContribution) > 5) {
+                    effectiveDist = (gpsContribution * 0.3) + (stepContribution * 0.7);
+                }
+                this.currentProgress = Math.min(1.0, effectiveDist / this.totalPathMeters);
+                this.updateMarkerOnPath();
+            },
+
+            updateMarkerOnPath: function () {
+                const path = document.getElementById('routePath');
+                const marker = document.getElementById('userMarkerGroup');
+                if (!path || !marker) return;
+                const point = path.getPointAtLength(this.currentProgress * path.getTotalLength());
+                marker.setAttribute('transform', `translate(${point.x}, ${point.y})`);
+                this.syncCamera(point.x, point.y);
+            },
+
+            pulseUserMarker: function () {
+                const marker = document.getElementById('userMarkerInner');
+                if (marker) {
+                    marker.style.transition = 'none';
+                    marker.style.transform = 'scale(1.5)';
+                    marker.style.filter = 'drop-shadow(0 0 20px #a855f7) brightness(1.2)';
+                    setTimeout(() => {
+                        marker.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), filter 0.5s';
+                        marker.style.transform = 'scale(1)';
+                        marker.style.filter = 'drop-shadow(0 0 8px rgba(168, 85, 247, 0.6))';
+                    }, 50);
+                }
+            },
+
+            handleMotion: function (event) {
+                const accel = event.accelerationIncludingGravity; if (!accel) return;
+                const mag = Math.sqrt(accel.x * accel.x + accel.y * accel.y + accel.z * accel.z);
+                const now = Date.now();
+                if (mag > 12.0 && (now - this.lastStepTime > 320)) {
+                    this.stepsTaken++;
+                    this.pedometerDist = this.stepsTaken * this.stepLength;
+                    this.lastStepTime = now;
+                    this.pulseUserMarker();
+                    this.updateProgressAndMarker();
+                }
+            },
+
+            handleOrientation: function (event) {
+                if (!this.isCompassActive) return;
+                let heading = event.webkitCompassHeading || (event.alpha !== null ? 360 - event.alpha : 0);
+                this.compassBearing = heading;
                 this.syncCamera();
-                this.startForceRecenter();
-            }
+            },
+
+            syncCamera: function (forceX, forceY) {
+                const svgEl = document.querySelector('#wayfinderMap svg'), container = document.getElementById('wayfinderMapContainer');
+                if (!svgEl || !container) return;
+                let userX = forceX, userY = forceY;
+                if (userX === undefined || userY === undefined) {
+                    const marker = document.getElementById('userMarkerGroup');
+                    if (marker) {
+                        const match = (marker.getAttribute('transform') || '').match(/translate\(([^, ]+)[, ]+([^)]+)\)/);
+                        if (match) { userX = parseFloat(match[1]); userY = parseFloat(match[2]); }
+                    }
+                }
+                if (userX === undefined || userY === undefined) return;
+                const rect = container.getBoundingClientRect();
+                const userX_px = userX * (rect.width / this.svgWidth), userY_px = userY * (rect.height / this.svgHeight);
+                const bearing = this.isCompassActive ? (this.compassBearing + 22.5) : 0;
+                const dx = (rect.width/2 + (this.isCompassActive ? 0 : this.panX)) - userX_px;
+                const dy = (rect.height/2 + (this.isCompassActive ? 0 : this.panY)) - userY_px;
+                svgEl.style.transformOrigin = `${userX_px}px ${userY_px}px`;
+                svgEl.style.transform = `translate(${dx}px, ${dy}px) scale(1) rotate(${-bearing}deg)`;
+                const arrow = document.getElementById('userHeadingArrow');
+                if (arrow) arrow.setAttribute('transform', `rotate(${bearing})`);
+            },
+
+            startCompass: function () {
+                if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    if (sessionStorage.getItem('ERYZION_SENSORS_GRANTED') === 'true') { this.activateListeners(); return; }
+                    Promise.all([DeviceOrientationEvent.requestPermission(), (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') ? DeviceMotionEvent.requestPermission() : Promise.resolve('granted')])
+                        .then(res => { if (res.every(r => r === 'granted')) { sessionStorage.setItem('ERYZION_SENSORS_GRANTED', 'true'); this.activateListeners(); } });
+                } else { this.activateListeners(); }
+            },
+
+            activateListeners: function () {
+                this.isCompassActive = true;
+                const btn = document.getElementById('btnGPSMode');
+                if (btn) {
+                    btn.classList.add('active');
+                    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="width:18px;height:18px;"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="currentColor"></polygon></svg><span>GPS ATIVO</span>`;
+                }
+                window.addEventListener('deviceorientation', this.handleOrientation.bind(this), true);
+                window.addEventListener('devicemotion', this.handleMotion.bind(this), true);
+                this.isMotionActive = true; this.startTracking(); showToast("🚀 GPS + Pedômetro Ativado", "success");
+            },
+
+            startTracking: function () {
+                if (!navigator.geolocation || this.watchId) return;
+                this.watchId = navigator.geolocation.watchPosition(pos => {
+                    if (pos.coords.accuracy > 150) return;
+                    if (!this.startPos) { this.startPos = { lat: pos.coords.latitude, lon: pos.coords.longitude }; return; }
+                    this.gpsDist = this.calculateDistance(this.startPos.lat, this.startPos.lon, pos.coords.latitude, pos.coords.longitude);
+                    this.updateProgressAndMarker();
+                }, err => console.warn(err), { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 });
+            },
+
+            stopCompass: function () {
+                this.isCompassActive = false; if (this.watchId) navigator.geolocation.clearWatch(this.watchId); this.watchId = null;
+                const btn = document.getElementById('btnGPSMode'); if (btn) { btn.classList.remove('active'); btn.querySelector('span').innerText = "MODO GPS"; }
+                window.removeEventListener('deviceorientation', this.handleOrientation.bind(this), true);
+                window.removeEventListener('devicemotion', this.handleMotion.bind(this), true);
+                const svgWrap = document.querySelector('#wayfinderMap svg');
+                if (svgWrap) { svgWrap.style.transformOrigin = 'center center'; svgWrap.style.transform = `scale(1) translate(0,0) rotate(0deg)`; }
+                showToast("Navegação Encerrada", "info");
+            },
+
+            calculateDistance: function (lat1, lon1, lat2, lon2) {
+                const R = 6371e3, f1 = lat1 * Math.PI/180, f2 = lat2 * Math.PI/180;
+                const df = (lat2-lat1)*Math.PI/180, dl = (lon2-lon1)*Math.PI/180;
+                const a = Math.sin(df/2)*Math.sin(df/2) + Math.cos(f1)*Math.cos(f2)*Math.sin(dl/2)*Math.sin(dl/2);
+                return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            },
+
+            startForceRecenter: function () {
+                this.panX = 0; this.panY = 0; this._forceRecenterUntil = Date.now() + 3000;
+                const recLoop = () => { if (Date.now() < this._forceRecenterUntil) { this.syncCamera(); requestAnimationFrame(recLoop); } };
+                recLoop();
+            },
+
+            ensurePermissions: function (callback) {
+                if (this._sessionGpsGranted) { callback(); return; }
+                navigator.geolocation.getCurrentPosition(() => { this._sessionGpsGranted = true; callback(); }, () => callback(), { enableHighAccuracy: true });
+            },
+
+            initTouchEvents: function () {
+                const container = document.getElementById('wayfinderMapContainer');
+                if (!container || container._hasTouchInited) return;
+                container.addEventListener('touchstart', (e) => {
+                    if (e.touches.length === 1) {
+                        this.isUserPanning = true; this.lastTouchX = e.touches[0].clientX; this.lastTouchY = e.touches[0].clientY; this._forceRecenterUntil = 0;
+                        const svg = document.querySelector('#wayfinderMap svg'); if (svg) svg.style.transition = 'none';
+                    }
+                }, { passive: false });
+                container.addEventListener('touchmove', (e) => {
+                    if (this.isUserPanning && e.touches.length === 1) {
+                        e.preventDefault(); this.panX += e.touches[0].clientX - this.lastTouchX; this.panY += e.touches[0].clientY - this.lastTouchY;
+                        this.lastTouchX = e.touches[0].clientX; this.lastTouchY = e.touches[0].clientY; this.syncCamera();
+                    }
+                }, { passive: false });
+                container.addEventListener('touchend', () => {
+                    this.isUserPanning = false;
+                    const svg = document.querySelector('#wayfinderMap svg'); if (svg) svg.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                });
+                container._hasTouchInited = true;
+            },
+
+            checkContext: function () { if (window.self !== window.top) { const btn = document.getElementById('btnGPSFullscreen'); if (btn) btn.style.display = 'inline-flex'; } },
+            goFullscreen: function () { window.open(window.location.href, '_blank'); },
+            startOriginScanner: function () {
+                if (this.originQrScanner) return;
+                this.originQrScanner = new Html5Qrcode("origin-reader");
+                Html5Qrcode.getCameras().then(devices => {
+                    if (devices.length > 0) {
+                        const back = devices.find(d => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('traseira')) || devices[0];
+                        this.currentOriginCameraId = back.id;
+                        this.originQrScanner.start(back.id, { fps: 10, qrbox: 250 }, (text) => this.processQrResult(text));
+                    }
+                });
+            },
+            stopOriginScanner: function () { if (this.originQrScanner) { this.originQrScanner.stop().then(() => { this.originQrScanner = null; }); } },
+            processQrResult: function (text) {
+                let target = text.toUpperCase().trim().includes('V') ? `${text.trim()[0]}-VERSO` : text.trim()[0];
+                showToast(`📍 Origem: ${target}`, "success"); this.stopOriginScanner(); selecionarOrigemRapida(target);
+            },
+            toggleOriginFlash: function () { if (this.originQrScanner) { this.isOriginFlashOn = !this.isOriginFlashOn; this.originQrScanner.applyVideoConstraints({ advanced: [{ torch: this.isOriginFlashOn }] }); } }
         };
+
 
         // Global Wayfinder Handlers
         window.abrirWayfinderRapido = function (index) {
@@ -8550,34 +8322,77 @@
     <!-- NOVO: Seletor de Origem (Grid Manual Fallback) -->
     <div id="wayfinderOriginOverlay" class="wayfinder-origin-overlay">
         <div class="origin-selector-card">
-            <button class="origin-close-btn" onclick="Wayfinder.stopOriginScanner(); fecharWayfinderRapido()">&times;</button>
-            <div class="origin-selector-title">ESCANEIE A PRATELEIRA</div>
+            <button class="origin-close-btn"
+                onclick="Wayfinder.stopOriginScanner(); fecharWayfinderRapido()">&times;</button>
 
-            <div class="origin-scanner-container">
-                <div id="origin-reader" class="origin-qr-reader"></div>
-                <div class="origin-qr-laser"></div>
-                <div class="origin-qr-overlay-text">Aponte para o QR da Prateleira</div>
+            <div id="originScannerView">
+                <div class="origin-selector-title">ESCANEIE A PRATELEIRA</div>
+                <div class="origin-scanner-container">
+                    <div id="origin-reader" class="origin-qr-reader"></div>
+                    <div class="origin-qr-laser"></div>
+                    <div class="origin-qr-overlay-text">Aponte para o QR da Prateleira</div>
+                </div>
+
+                <div class="origin-scanner-controls">
+                    <button class="btn-origin-camera" onclick="Wayfinder.toggleOriginFlash()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                        </svg>
+                        Flash
+                    </button>
+                    <button class="btn-origin-camera" onclick="Wayfinder.switchOriginCamera()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M23 4v6h-6M1 20v-6h6" />
+                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+                        </svg>
+                        Câmera
+                    </button>
+                </div>
+
+                <div style="margin-top:20px; display: flex; flex-direction: column; gap: 10px;">
+                    <button class="btn" onclick="Wayfinder.showManualOrigin()"
+                        style="background:rgba(0,255,65,0.1); color:#00ff41; font-size:11px; padding:12px; border: 1px solid rgba(0,255,65,0.2);">SELECIONAR
+                        MANUALMENTE</button>
+
+                    <button class="btn" onclick="Wayfinder.stopOriginScanner(); selecionarOrigemRapida('AUTO')"
+                        style="background:rgba(255,255,255,0.05); color:#fff; font-size:11px; padding:12px; border: 1px solid rgba(255,255,255,0.1);">USAR
+                        GPS AUTOMÁTICO (MAPA)</button>
+                </div>
             </div>
 
-            <div class="origin-scanner-controls">
-                <button class="btn-origin-camera" onclick="Wayfinder.toggleOriginFlash()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-                    </svg>
-                    Flash
-                </button>
-                <button class="btn-origin-camera" onclick="Wayfinder.switchOriginCamera()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M23 4v6h-6M1 20v-6h6" />
-                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
-                    </svg>
-                    Câmera
-                </button>
-            </div>
+            <div id="originManualView" style="display:none;">
+                <div class="origin-selector-title">SELECIONE A PRATELEIRA</div>
 
-            <div style="margin-top:20px; text-align:center;">
-                <button class="btn" onclick="Wayfinder.stopOriginScanner(); selecionarOrigemRapida('AUTO')"
-                    style="background:rgba(255,255,255,0.05); color:#fff; font-size:11px; padding:12px; width: 100%; border: 1px solid rgba(255,255,255,0.1);">USAR GPS AUTOMÁTICO (MAPA)</button>
+                <div class="manual-grid-scroll">
+                    <div class="origin-column-title">FILEIRA A-K</div>
+                    <div class="manual-grid">
+                        <button class="manual-btn" onclick="selecionarOrigemRapida('A')">A</button>
+                        <button class="manual-btn" onclick="selecionarOrigemRapida('B')">B</button>
+                        <button class="manual-btn" onclick="selecionarOrigemRapida('C')">C</button>
+                        <button class="manual-btn" onclick="selecionarOrigemRapida('D')">D</button>
+                        <button class="manual-btn" onclick="selecionarOrigemRapida('E')">E</button>
+                        <button class="manual-btn" onclick="selecionarOrigemRapida('F')">F</button>
+                        <button class="manual-btn" onclick="selecionarOrigemRapida('G')">G</button>
+                        <button class="manual-btn" onclick="selecionarOrigemRapida('H')">H</button>
+                        <button class="manual-btn" onclick="selecionarOrigemRapida('I')">I</button>
+                        <button class="manual-btn" onclick="selecionarOrigemRapida('J')">J</button>
+                        <button class="manual-btn" onclick="selecionarOrigemRapida('K')">K</button>
+                    </div>
+
+                    <div class="origin-column-title" style="margin-top:20px;">FILEIRA M-O</div>
+                    <div class="manual-grid">
+                        <button class="manual-btn" onclick="selecionarOrigemRapida('M')">M</button>
+                        <button class="manual-btn" onclick="selecionarOrigemRapida('L')">L</button>
+                        <button class="manual-btn" onclick="selecionarOrigemRapida('N')">N</button>
+                        <button class="manual-btn" onclick="selecionarOrigemRapida('O')">O</button>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="Wayfinder.showScannerOrigin()"
+                    style="margin-top:25px; background:rgba(255,255,255,0.05); color:#fff; font-size:11px; padding:12px; width: 100%; border: 1px solid rgba(255,255,255,0.1);">VOLTAR
+                    AO SCANNER</button>
             </div>
         </div>
     </div>
