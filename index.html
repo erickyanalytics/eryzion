@@ -2078,30 +2078,30 @@
             z-index: 5;
         }
 
-        /* Orientação Calibrada: Norte à Esquerda */
+        /* Orientação Calibrada e 'Torta' (+22.5°) */
         .cardinal-n {
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%) rotate(-90deg);
+            left: 20px;
+            top: calc(50% - 15px);
+            transform: translateY(-50%) rotate(-67.5deg);
             color: rgba(255, 68, 68, 0.4);
         }
 
         .cardinal-s {
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%) rotate(90deg);
+            right: 20px;
+            top: calc(50% + 15px);
+            transform: translateY(-50%) rotate(112.5deg);
         }
 
         .cardinal-o {
-            top: 12px;
-            left: 50%;
-            transform: translateX(-50%);
+            top: 15px;
+            left: calc(50% + 15px);
+            transform: translateX(-50%) rotate(22.5deg);
         }
 
         .cardinal-l {
-            bottom: 12px;
-            left: 50%;
-            transform: translateX(-50%);
+            bottom: 15px;
+            left: calc(50% - 15px);
+            transform: translateX(-50%) rotate(22.5deg);
         }
 
         .wayfinder-svg-wrapper {
