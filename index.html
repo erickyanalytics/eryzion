@@ -1534,18 +1534,19 @@
         }
 
         .wayfinder-modal {
-            background: rgba(10, 10, 10, 0.98);
-            border: 1px solid rgba(0, 255, 65, 0.2);
-            border-radius: 28px;
-            width: 95%;
-            max-width: 600px;
-            max-height: 90vh;
+            background: #000;
+            border: none;
+            border-radius: 0;
+            width: 100vw;
+            height: 100vh;
+            max-width: none;
+            max-height: none;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.9), 0 0 50px rgba(0, 255, 65, 0.1);
-            transform: translateY(30px) scale(0.95);
-            transition: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: none;
+            transform: none;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .wayfinder-modal-overlay.active .wayfinder-modal {
@@ -1668,62 +1669,122 @@
             fill: rgba(255, 255, 255, 0.05);
         }
 
-        /* HUD Estilizado */
-        /* HUD Estilizado tipo Itinerário */
-        .wayfinder-hud {
+        /* WAYFINDER FULL-SCREEN REBORN */
+        #wayfinderModalOverlay.active {
+            display: flex !important;
+            animation: slide-up-full 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .wayfinder-modal {
+            width: 100vw !important;
+            height: 100dvh !important;
+            max-width: none !important;
+            border-radius: 0 !important;
+            background: #000 !important;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: none !important;
+            padding: 0 !important;
+        }
+
+        .wayfinder-modal-header {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(10, 10, 10, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            height: 60px;
+            padding: 0 15px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.02);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            margin-bottom: 10px;
+            justify-content: space-between;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .wayfinder-modal-body {
+            flex: 1;
+            padding: 0 !important;
+            position: relative;
+        }
+
+        .wayfinder-container {
+            width: 100% !important;
+            height: 100% !important;
+            padding: 0 !important;
+            gap: 0 !important;
+            background: #000 !important;
+        }
+
+        .wayfinder-svg-wrapper {
+            width: 100%;
+            height: 100%;
+            border-radius: 0 !important;
+            position: relative;
+            background: #000;
+        }
+
+        /* HUD ITINERÁRIO FLUTUANTE */
+        .wayfinder-hud {
+            position: absolute;
+            bottom: 30px;
+            left: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 15px;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        @keyframes slide-up-full {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         .hud-route-wrapper {
             display: flex;
             align-items: center;
-            gap: 30px;
+            gap: 15px;
+            flex-grow: 1;
         }
 
-        .hud-point.origin {
-            background: rgba(168, 85, 247, 0.05);
-            border: 1px solid rgba(168, 85, 247, 0.15);
-            padding: 8px 15px;
-            border-radius: 12px;
+        .hud-point {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px 18px;
+            border-radius: 16px;
             position: relative;
-        }
-
-        .hud-point.origin:hover {
-            background: rgba(168, 85, 247, 0.1);
-            border-color: rgba(168, 85, 247, 0.3);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.1);
-        }
-
-        .hud-point.origin::after {
-            content: '✎';
-            position: absolute;
-            top: 6px;
-            right: 8px;
-            font-size: 8px;
-            color: rgba(168, 85, 247, 0.5);
-        }
-
-        .hud-point.dest {
-            cursor: default;
+            min-width: 80px;
         }
 
         .hud-label {
-            font-size: 9px;
-            color: rgba(255, 255, 255, 0.3);
+            display: block;
+            font-size: 8px;
+            color: rgba(255, 255, 255, 0.4);
             text-transform: uppercase;
-            letter-spacing: 1.5px;
+            letter-spacing: 1px;
             font-weight: 800;
         }
 
         .hud-value {
-            font-size: 10px;
+            font-size: 14px;
             font-weight: 800;
             color: #fff;
             font-family: 'Outfit', sans-serif;
@@ -1737,77 +1798,203 @@
             color: #00ff41;
         }
 
-        .hud-arrow {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0.4;
-        }
-
-        .hud-arrow svg {
-            width: 24px;
-            height: 24px;
-            color: #fff;
-            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.2));
-        }
-
-        .wayfinder-hud select {
-            background: rgba(255, 255, 255, 0.05);
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 4px 28px 4px 8px;
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-            outline: none;
-            appearance: none;
-            opacity: 0;
-            width: 0;
-            height: 0;
-            position: absolute;
-            pointer-events: none;
-        }
-
-        .wayfinder-hud select option,
-        .wayfinder-hud select optgroup {
-            background-color: #1a1a1a;
-            color: #fff;
-            padding: 10px;
-        }
-
-        /* Botão MODO GPS Premium */
         .btn-gps-mode {
-            background: rgba(168, 85, 247, 0.1);
-            color: #a855f7;
-            border: 1px solid rgba(168, 85, 247, 0.3);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 11px;
+            background: var(--color-primary);
+            color: #000;
+            border-radius: 16px;
+            padding: 12px 24px;
             font-weight: 800;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 20px var(--color-primary-glow);
+            transition: 0.3s;
             display: flex;
             align-items: center;
             gap: 8px;
-            cursor: pointer;
-            transition: 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
-        .btn-fullscreen {
-            background: rgba(255, 255, 255, 0.05);
-            color: rgba(255, 255, 255, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 700;
+        .btn-gps-mode.active {
+            background: #a855f7;
+            color: #fff;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+        }
+
+        .modal-close-button {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+        }
+
+        /* ══════════════════════════════════════════════════
+           WAYFINDER ORIGIN SELECTOR — Eryzion Premium
+           ══════════════════════════════════════════════════ */
+        .wayfinder-origin-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(20px);
+            z-index: 5000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .wayfinder-origin-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .origin-selector-card {
+            background: rgba(20, 20, 20, 0.6);
+            border: 1px solid rgba(0, 255, 65, 0.15);
+            border-radius: 32px;
+            padding: 30px;
+            width: 95%;
+            max-width: 450px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(30px) scale(0.95);
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            scrollbar-width: none;
+        }
+
+        .wayfinder-origin-overlay.active .origin-selector-card {
+            transform: translateY(0) scale(1);
+        }
+
+        .origin-selector-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 900;
+            letter-spacing: 3px;
+            color: #fff;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+        }
+
+        .origin-grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .origin-column-title {
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 8px;
+        }
+
+        .origin-btn-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .origin-select-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 800;
             cursor: pointer;
             transition: 0.3s;
-            display: none;
-            /* Só aparece se estiver em iframe */
-            align-items: center;
-            gap: 6px;
+        }
+
+        .origin-select-btn:hover {
+            background: rgba(0, 255, 65, 0.1);
+            border-color: #00ff41;
+            color: #00ff41;
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+        }
+
+        .origin-select-btn.verso {
+            color: #a855f7;
+            border-color: rgba(168, 85, 247, 0.2);
+        }
+
+        .origin-select-btn.verso:hover {
+            background: rgba(168, 85, 247, 0.1);
+            border-color: #a855f7;
+            color: #a855f7;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.2);
+        }
+
+        .origin-close-btn {
+            position: absolute;
+            top: 20px; right: 20px;
+            background: none; border: none;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 28px; cursor: pointer;
+        }
+
+        .wayfinder-hud {
+            display: none !important;
+        }
+
+        /* Ocultar elementos marcados como 'spam' pelo usuário */
+        .wayfinder-hud select, 
+        .wayfinder-hud .wayfinder-badge,
+        .btn-fullscreen { 
+            display: none !important; 
+        }
+
+        .btn-entendi-floating {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 12px 35px;
+            border-radius: 100px;
+            font-weight: 800;
+            font-size: 13px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            z-index: 6000;
+            transition: 0.3s;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-entendi-floating:hover {
+            background: rgba(40, 40, 40, 0.9);
+            transform: translateX(-50%) translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .wayfinder-modal-footer {
+            display: none !important;
+        }
+
+        .wayfinder-svg-wrapper {
+            touch-action: none;
+            cursor: grab;
+        }
+
+        .wayfinder-svg-wrapper:active {
+            cursor: grabbing;
         }
 
         .btn-fullscreen:hover {
@@ -2833,7 +3020,7 @@
 
         @media (max-width: 480px) {
             .container {
-                padding: 60px 15px 20px;
+                padding: 60px 0px 20px;
             }
 
             .filter-row {
@@ -3163,6 +3350,8 @@
             transform-style: preserve-3d;
             animation: cube-rotate 4s cubic-bezier(0.445, 0.05, 0.55, 0.95) infinite;
             margin-bottom: 35px;
+            /* Hardware Acceleration */
+            will-change: transform;
         }
 
         .cube {
@@ -3176,13 +3365,15 @@
             position: absolute;
             width: 60px;
             height: 60px;
-            border: 1.2px solid rgb(255, 255, 255);
-            background: rgb(0, 0, 0);
-            backdrop-filter: blur(4px);
+            border: 1.2px solid rgba(255, 255, 255, 0.8);
+            background: rgba(0, 0, 0, 0.85);
+            /* Otimizado: remove blur para ganho de GPU */
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.05);
+            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.1);
+            backface-visibility: hidden;
+            /* Otimizado: evita renderizar faces ocultas */
         }
 
         /* Cores de face suavizadas - Ajustadas para 60px (Z = 30px) */
@@ -3220,7 +3411,8 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            box-shadow: 0 0 20px #ffffff, 0 0 40px rgba(255, 255, 255, 0.6);
+            box-shadow: 0 0 15px #ffffff;
+            /* Otimizado: sombra única mais leve */
             animation: core-pulse 2s infinite alternate ease-in-out;
         }
 
@@ -3262,11 +3454,12 @@
         }
 
         .cube-wrapper.black-hole .cube-core {
-            width: 40px;
-            height: 40px;
+            transform: translate(-50%, -50%) scale(2.2);
+            /* Otimizado: usa scale em vez de width/height */
             background: #fff;
-            box-shadow: 0 0 30px #fff, 0 0 60px #fff, 0 0 100px rgba(255, 255, 255, 0.4);
-            transition: all 0.5s ease;
+            box-shadow: 0 0 30px #fff, 0 0 60px rgba(255, 255, 255, 0.6);
+            /* Otimizado: sombras mais leves */
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.8s ease;
         }
 
         /* Estilo para os itens sendo sugados */
@@ -6678,18 +6871,75 @@
             watchId: null,
             startPos: null,
             currentProgress: 0,
+            
+            // Touch/Drag State
+            isUserPanning: false,
+            panX: 0,
+            panY: 0,
+            lastTouchX: 0,
+            lastTouchY: 0,
+            
+            // Session Lock to prevent multiple geolocation prompts
+            _sessionGpsGranted: false,
+            
+            // Session Lock to prevent multiple geolocation prompts
+            _sessionGpsGranted: false,
 
             init: function (destShelfName) {
                 this.currentDest = `CABOS - ${destShelfName}`;
                 this.currentProgress = 0;
                 this.startPos = null;
+                this.panX = 0;
+                this.panY = 0;
+                this.isUserPanning = false;
 
                 this.drawBaseMap();
                 this.updateLabels();
                 this.checkContext();
+                this.initTouchEvents();
 
                 // Reset state
                 this.stopCompass();
+            },
+
+            initTouchEvents: function () {
+                const container = document.getElementById('wayfinderMapContainer');
+                if (!container || container._hasTouchInited) return;
+
+                container.addEventListener('touchstart', (e) => {
+                    if (e.touches.length === 1) {
+                        this.isUserPanning = true;
+                        this.lastTouchX = e.touches[0].clientX;
+                        this.lastTouchY = e.touches[0].clientY;
+                        
+                        const svg = document.querySelector('#wayfinderMap svg');
+                        if (svg) svg.style.transition = 'none';
+                    }
+                }, { passive: false });
+
+                container.addEventListener('touchmove', (e) => {
+                    if (this.isUserPanning && e.touches.length === 1) {
+                        e.preventDefault();
+                        const dx = e.touches[0].clientX - this.lastTouchX;
+                        const dy = e.touches[0].clientY - this.lastTouchY;
+                        
+                        this.panX += dx / (this.isCompassActive ? this.followZoom : 1.5);
+                        this.panY += dy / (this.isCompassActive ? this.followZoom : 1.5);
+                        
+                        this.lastTouchX = e.touches[0].clientX;
+                        this.lastTouchY = e.touches[0].clientY;
+                        
+                        this.syncCamera();
+                    }
+                }, { passive: false });
+
+                container.addEventListener('touchend', () => {
+                    this.isUserPanning = false;
+                    const svg = document.querySelector('#wayfinderMap svg');
+                    if (svg) svg.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                });
+
+                container._hasTouchInited = true;
             },
 
             checkContext: function () {
@@ -6705,86 +6955,89 @@
                 window.open(window.location.href, '_blank');
             },
 
-            syncCamera: function () {
+            syncCamera: function (forceX, forceY) {
                 const svgEl = document.querySelector('#wayfinderMap svg');
                 if (!svgEl) return;
 
-                const originLabel = document.getElementById('wayfinderUserLoc').value;
-                if (!originLabel && !this.isCompassActive) {
-                    svgEl.style.transform = `scale(1) translate(0,0) rotate(0deg)`;
-                    return;
+                let userX = forceX, userY = forceY;
+
+                // Se não for forçado, tenta pegar do progresso da rota ou da origem manual
+                if (userX === undefined || userY === undefined) {
+                    const path = document.getElementById('routePath');
+                    if (path && this.currentProgress > 0) {
+                        const totalLength = path.getTotalLength();
+                        const point = path.getPointAtLength(this.currentProgress * totalLength);
+                        userX = point.x;
+                        userY = point.y;
+                    } else {
+                        // Fallback: Centro da Prateleira de Origem Manual
+                        const originLabel = document.getElementById('wayfinderUserLoc') ? document.getElementById('wayfinderUserLoc').value : null;
+                        if (originLabel) {
+                            const originShelfKey = `CABOS - ${originLabel}`;
+                            const pos = this.MAPA_PRATELEIRAS[originShelfKey];
+                            if (pos) {
+                                const colWidth = 30;
+                                userX = pos.x * colWidth + (colWidth / 2) + 3;
+                                userY = pos.isVerso ? 107 : (pos.y === 0 ? 95 : 195);
+                            }
+                        }
+                    }
                 }
 
-                const originShelfKey = `CABOS - ${originLabel}`;
-                const pos = this.MAPA_PRATELEIRAS[originShelfKey];
+                // Se ainda assim não tiver coordenadas (ex: início sem nada), não faz nada
+                if (userX === undefined || userY === undefined) return;
 
-                // Se não tiver posição, apenas reseta
-                if (!pos) {
-                    svgEl.style.transform = `scale(1) translate(0,0) rotate(0deg)`;
-                    return;
-                }
-
-                // Coordenadas reais no SVG
-                const colWidth = 30;
-                const userX = pos.x * colWidth + (colWidth / 2) + 3;
-
-                // Determina Y baseado se é verso ou não
-                let userY;
-                if (pos.isVerso) {
-                    userY = 107; // Central
-                } else {
-                    userY = (pos.y === 0) ? 95 : 195;
-                }
+                const centerX = this.svgWidth / 2;
+                const centerY = this.svgHeight / 2;
+                const dx = centerX - userX + this.panX;
+                const dy = centerY - userY + this.panY;
 
                 if (this.isCompassActive) {
-                    // MODO FOLLOW: Zoom alto, centralizado no usuário e rotacionado
-                    const centerX = this.svgWidth / 2;
-                    const centerY = this.svgHeight / 2;
-
-                    // Deslocamento para colocar o usuário no centro
-                    const dx = centerX - userX;
-                    const dy = centerY - userY;
-
-                    // Aplica: ZOOM -> ROTAÇÃO -> TRANSLATION
-                    // Usamos transform-origin no centro do SVG para a rotação ser natural
                     svgEl.style.transformOrigin = `${userX}px ${userY}px`;
                     svgEl.style.transform = `scale(${this.followZoom}) translate(${dx}px, ${dy}px) rotate(${-this.compassBearing}deg)`;
-
-                    document.querySelector('.hud-point.origin').classList.add('pulse');
                 } else {
-                    // MODO ESTÁTICO: Apenas centraliza sem rotação ou zoom excessivo
-                    svgEl.style.transformOrigin = `center center`;
-                    svgEl.style.transform = `scale(1) translate(0,0) rotate(0deg)`;
-                    document.querySelector('.hud-point.origin').classList.remove('pulse');
+                    // Zoom Manual (focado na origem/ponto atual)
+                    svgEl.style.transformOrigin = `${userX}px ${userY}px`;
+                    svgEl.style.transform = `scale(1.8) translate(${dx}px, ${dy}px) rotate(0deg)`;
                 }
             },
 
             ensurePermissions: function (callback) {
                 if (!navigator.geolocation) {
-                    showToast("GPS não suportado neste navegador", "error");
+                    showToast("GPS não suportado", "error");
                     callback();
                     return;
                 }
 
-                showToast("🛰️ Verificando permissões de localização...", "info");
+                // Session Lock: Se já concedido nesta sessão, ignora qualquer prompt
+                if (this._sessionGpsGranted || localStorage.getItem('ERYZION_GPS_GRANTED') === 'true') {
+                    this._sessionGpsGranted = true;
+                    callback();
+                    return;
+                }
 
+                this.requestGeolocation(callback);
+            },
+
+            requestGeolocation: function (callback) {
+                if (this._requestingGps) return;
+                this._requestingGps = true;
+
+                showToast("🛰️ Sincronizando Localização...", "info");
+                
                 navigator.geolocation.getCurrentPosition(
                     (pos) => {
-                        console.log("Localização concedida");
+                        this._sessionGpsGranted = true;
+                        localStorage.setItem('ERYZION_GPS_GRANTED', 'true');
+                        this._requestingGps = false;
                         callback();
                     },
                     (err) => {
-                        console.warn("Localização negada ou erro:", err);
-
-                        let msg = "Acesso à localização negado. O GPS funcionará em modo manual.";
-                        if (window.self !== window.top) {
-                            msg = "Sensores bloqueados pelo Google Sites. Use o botão 'GPS TELA CHEIA'.";
-                        }
-
-                        showToast(msg, "warning");
+                        console.warn("Erro GPS:", err);
+                        this._requestingGps = false;
                         callback();
                     },
-                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                    { enableHighAccuracy: true, timeout: 6000, maximumAge: 300000 } // Cache agressivo (5 min) para evitar re-prompts
                 );
             },
 
@@ -6801,9 +7054,16 @@
 
                 // Pedir permissão no iOS
                 if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    // Cache de Bússola para iOS (Sticky Session)
+                    if (sessionStorage.getItem('ERYZION_COMPASS_GRANTED') === 'true') {
+                        this.activateCompassListener();
+                        return;
+                    }
+
                     DeviceOrientationEvent.requestPermission()
                         .then(response => {
                             if (response === 'granted') {
+                                sessionStorage.setItem('ERYZION_COMPASS_GRANTED', 'true');
                                 this.activateCompassListener();
                             } else {
                                 showToast("Permissão de Bússola negada", "error");
@@ -6811,7 +7071,6 @@
                         })
                         .catch(err => {
                             console.error(err);
-                            showToast("Erro ao acessar sensores", "error");
                         });
                 } else {
                     // Android ou desktop
@@ -6824,24 +7083,34 @@
                 const btn = document.getElementById('btnGPSMode');
                 if (btn) {
                     btn.classList.add('active');
-                    btn.querySelector('span').innerText = "GPS ATIVO";
+                    btn.innerHTML = `
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="width:18px;height:18px;">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="currentColor"></polygon>
+                        </svg>
+                        <span>GPS ATIVO</span>`;
                 }
 
+                window.removeEventListener('deviceorientation', this.handleOrientation.bind(this), true);
                 window.addEventListener('deviceorientation', this.handleOrientation.bind(this), true);
-
-                // Inicia Rastreamento de Movimento Real
                 this.startTracking();
 
-                showToast("🛰️ Modo Navegação Ativado!", "success");
+                showToast("🚀 GPS Ativado", "success");
             },
 
             startTracking: function () {
-                if (!navigator.geolocation) return;
+                if (!navigator.geolocation || this.watchId) return;
 
                 this.watchId = navigator.geolocation.watchPosition(
                     (pos) => {
                         const { latitude, longitude, accuracy } = pos.coords;
                         console.log(`GPS: ${latitude}, ${longitude} accuracy: ${accuracy}`);
+
+                        // Descarta pontos com precisão ruim (> 200m) para evitar pulos no mapa
+                        if (accuracy > 200) {
+                            console.warn("GPS ignorado devido a baixa precisão.");
+                            return;
+                        }
 
                         if (!this.startPos) {
                             this.startPos = { lat: latitude, lon: longitude };
@@ -6987,10 +7256,15 @@
                 if (select) select.value = '';
 
                 const destBadge = document.getElementById('wayfinderDestBadge');
-                if (destBadge) destBadge.textContent = `DESTINO: ${shelfDestName || '?'}`;
+                if (destBadge) destBadge.textContent = shelfDestName || '?';
 
                 const originBadge = document.getElementById('wayfinderOriginBadge');
-                if (originBadge) originBadge.textContent = 'SUA POSIÇÃO: ?';
+                if (originBadge) originBadge.textContent = '?';
+
+                // Ativa modo GPS automaticamente para máxima precisão imediata
+                setTimeout(() => {
+                    this.activateCompassListener();
+                }, 100);
             },
 
             drawBaseMap: function () {
@@ -7155,66 +7429,72 @@
                     setTimeout(() => { pathEl.style.strokeDasharray = "10, 5"; }, 1200);
                 }
 
-                // Sincroniza câmera após atualizar rota se bússola estiver ativa
-                if (this.isCompassActive) {
-                    this.syncCamera();
-                }
+                // Sincroniza câmera após atualizar rota (Centraliza na origem ou usuário)
+                this.syncCamera();
             }
         };
 
-        // Funções do GPS Rápido
+        // Global Wayfinder Handlers
         window.abrirWayfinderRapido = function (index) {
-            Wayfinder.ensurePermissions(() => {
-                const p = RESULTADOS_ATUAIS[index];
-                if (!p) return;
-                window._pendingGPSIndex = index;
-                document.getElementById('quickGPSOverlay').classList.add('active');
+            // Auto-Close: Limpa qualquer modal aberto antes de abrir o GPS
+            const dOverlay = document.getElementById('detalhesOverlay');
+            if (dOverlay) dOverlay.classList.remove('active', 'details-active');
+            
+            window._pendingGPSIndex = index;
+            const overlay = document.getElementById('wayfinderOriginOverlay');
+            if (overlay) {
+                overlay.classList.add('active');
                 document.body.classList.add('modal-open');
-            });
+            } else {
+                Wayfinder.ensurePermissions(() => {
+                    const p = RESULTADOS_ATUAIS[index];
+                    if (!p) return;
+                    window._currentWayfinderProduct = p;
+                    Wayfinder.init(p.Prateleira);
+                    document.getElementById('wayfinderModalOverlay').classList.add('active');
+                });
+            }
         };
 
-        window.fecharWayfinderRapido = function () {
-            document.getElementById('quickGPSOverlay').classList.remove('active');
-            document.body.classList.remove('modal-open');
-        };
+        window.selecionarOrigemRapida = function (originLabel) {
+            const originOverlay = document.getElementById('wayfinderOriginOverlay');
+            if (originOverlay) originOverlay.classList.remove('active');
+            
+            const index = window._pendingGPSIndex;
+            const p = RESULTADOS_ATUAIS[index];
+            if (!p) return;
+            
+            window._currentWayfinderProduct = p;
+            Wayfinder.init(p.Prateleira);
 
-        window.abrirMapaDireto = function (index) {
-            Wayfinder.ensurePermissions(() => {
-                const p = RESULTADOS_ATUAIS[index];
-                if (!p) return;
-                window._currentWayfinderProduct = p;
-
-                Wayfinder.init(p.Prateleira);
-                document.getElementById('wayfinderModalOverlay').classList.add('active');
-                document.body.classList.add('modal-open');
-            });
-        };
-
-        window.fecharWayfinderModal = function () {
-            document.getElementById('wayfinderModalOverlay').classList.remove('active');
-            document.body.classList.remove('modal-open');
-        };
-
-        window.iniciarNavegacaoRapida = function (originLabel) {
-            Wayfinder.ensurePermissions(() => {
-                const index = window._pendingGPSIndex;
-                const p = RESULTADOS_ATUAIS[index];
-                window.fecharWayfinderRapido();
-
-                window._currentWayfinderProduct = p;
-
-                Wayfinder.init(p.Prateleira);
-                document.getElementById('wayfinderModalOverlay').classList.add('active');
-                document.body.classList.add('modal-open');
-
+            if (originLabel !== 'AUTO') {
                 setTimeout(() => {
                     const select = document.getElementById('wayfinderUserLoc');
                     if (select) {
                         select.value = originLabel;
                         Wayfinder.updateRoute();
                     }
-                }, 300);
-            });
+                }, 100);
+            } else {
+                Wayfinder.ensurePermissions(() => {
+                    Wayfinder.startCompass();
+                });
+            }
+
+            document.getElementById('wayfinderModalOverlay').classList.add('active');
+            document.body.classList.add('modal-open');
+            showToast("🚀 Navegação Iniciada", "success");
+        };
+
+        window.fecharWayfinderRapido = function () {
+            document.getElementById('wayfinderOriginOverlay').classList.remove('active');
+            document.body.classList.remove('modal-open');
+        };
+
+        window.fecharWayfinderModal = function () {
+            document.getElementById('wayfinderModalOverlay').classList.remove('active');
+            document.body.classList.remove('modal-open');
+            Wayfinder.stopCompass();
         };
 
 
@@ -8008,7 +8288,6 @@
                         PRODUTOS = JSON.parse(cachedProd);
                         Object.assign(QRCODES, JSON.parse(cachedQr));
 
-                        // Renderiza imediatamente se houver algo no input (ou apenas prepara o estado)
                         extrairValoresUnicos();
 
                         if (window.requestIdleCallback) {
@@ -8017,9 +8296,7 @@
                             setTimeout(preencherSelectsFiltros, 50);
                         }
 
-                        // Nota: NÃO removemos o loader aqui (hideLoader) 
-                        // pois o usuário quer ver o "Sincronizando" até a live sync (carregarDados) acabar.
-                        console.log('[Cache] Dados de cache aplicados, mantendo loader para sincronização ao vivo.');
+                        console.log('[Cache] Dados de cache aplicados.');
                     }
                 } catch (e) { console.warn('[Cache] Falha ao ler cache:', e); }
             };
@@ -8027,36 +8304,27 @@
             tentarCacheInstantaneo();
             carregarDados().then(hideLoader).catch(hideLoader);
 
-            // Loop de Sincronização de Aplicadores (Recursive Timeout)
             const syncAppLoop = async () => {
-                if (!document.hidden) {
-                    await fetchAplicadoresRealTime();
-                }
-                setTimeout(syncAppLoop, 3000); // 3s de intervalo garantido após o término
+                if (!document.hidden) await fetchAplicadoresRealTime();
+                setTimeout(syncAppLoop, 3000);
             };
             syncAppLoop();
 
-            // Loop de Sincronização de Dados Global (Recursive Timeout)
             const syncGlobalLoop = async () => {
-                if (!document.hidden) {
-                    await carregarDados(true);
-                }
-                setTimeout(syncGlobalLoop, 5000); // Aumentado para 5s para o ciclo de dados global
+                if (!document.hidden) await carregarDados(true);
+                setTimeout(syncGlobalLoop, 5000);
             };
             syncGlobalLoop();
 
             document.getElementById('radarSubmitBtn').onclick = window.enviarParaMaquinaRadar;
 
-            // -- Eventos do Menu de Opções --
             const optionsBtn = document.getElementById('optionsBtn');
             const optionsDropdown = document.getElementById('optionsDropdown');
-
             if (optionsBtn && optionsDropdown) {
                 optionsBtn.onclick = (e) => {
                     e.stopPropagation();
                     optionsDropdown.classList.toggle('show');
                 };
-
                 document.addEventListener('click', (e) => {
                     if (!optionsDropdown.contains(e.target) && e.target !== optionsBtn) {
                         optionsDropdown.classList.remove('show');
@@ -8065,20 +8333,16 @@
             }
         });
 
-        /* ══════════════════════════════════════════════════════
-        LOCALIZADOR DE APLICADOR (LÓGICA)
-        ══════════════════════════════════════════════════════ */
-
         window.abrirModalAplicador = function () {
             const overlay = document.getElementById('modalAplicadorOverlay');
             overlay.classList.add('active');
             document.body.classList.add('modal-open');
             document.getElementById('buscaAplicadorInput').value = '';
             document.getElementById('listaAplicadoresResultados').innerHTML = `
-                    <div style="text-align: center; color: #666; padding: 20px; font-size: 13px;">
-                        Digite o nome do aplicador para ver sua localização.
-                    </div>
-                `;
+                <div style="text-align: center; color: #666; padding: 20px; font-size: 13px;">
+                    Digite o nome do aplicador para ver sua localização.
+                </div>
+            `;
             setTimeout(() => document.getElementById('buscaAplicadorInput').focus(), 100);
         };
 
@@ -8091,94 +8355,93 @@
         window.filtrarLocalizacaoAplicador = function () {
             const termo = document.getElementById('buscaAplicadorInput').value.trim().toUpperCase();
             const container = document.getElementById('listaAplicadoresResultados');
-
             if (termo.length < 1) {
                 container.innerHTML = '<div style="text-align: center; color: #666; padding: 20px; font-size: 13px;">Digite o código do aplicador...</div>';
                 return;
             }
-
-            // Busca aplicadores únicos no cache de rastreio em tempo real
             const aplicadores = Object.keys(DADOS_APLICADORES)
                 .filter(codigo => codigo.toUpperCase().includes(termo))
                 .sort();
-
             if (aplicadores.length === 0) {
                 container.innerHTML = '<div style="text-align: center; color: #f44; padding: 20px; font-size: 13px;">Nenhum aplicador rastreado encontrado.</div>';
                 return;
             }
-
             container.innerHTML = aplicadores.map(codigo => {
                 const info = DADOS_APLICADORES[codigo];
                 const local = info.localizacao || 'Sem Localização';
                 const mov = info.ultimaMov || 'N/A';
-
                 return `
-                        <div style="background: rgba(168, 85, 247, 0.05); border: 1px solid rgba(168, 85, 247, 0.1); padding: 12px; border-radius: 8px;">
-                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
-                                <div style="color: #a855f7; font-weight: 800; font-size: 14px;">${codigo}</div>
+                    <div style="background: rgba(168, 85, 247, 0.05); border: 1px solid rgba(168, 85, 247, 0.1); padding: 12px; border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                            <div style="color: #a855f7; font-weight: 800; font-size: 14px;">${codigo}</div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 5px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                <span style="color: #fff; font-weight: 700; font-size: 13px;">${local}</span>
                             </div>
-                            <div style="display: flex; flex-direction: column; gap: 5px;">
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                                    <span style="color: #fff; font-weight: 700; font-size: 13px;">${local}</span>
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 8px; opacity: 0.6;">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                                    <span style="color: #ccc; font-size: 11px;">Última Mov: ${mov}</span>
-                                </div>
+                            <div style="display: flex; align-items: center; gap: 8px; opacity: 0.6;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                <span style="color: #ccc; font-size: 11px;">Última Mov: ${mov}</span>
                             </div>
                         </div>
-                    `;
+                    </div>`;
             }).join('');
         };
     </script>
-    <!-- SVG Filter for Electric Effect -->
-    <!-- SVG Filter for Electric Effect (Relaxante - mesmas configs do login Ajustes) -->
 
-    <!-- Overlay GPS Rápido -->
-    <div id="quickGPSOverlay" class="quick-gps-overlay">
-        <div class="quick-gps-selector">
-            <div class="quick-gps-close" onclick="fecharWayfinderRapido()">&times;</div>
-            <div class="quick-gps-title">Onde você está agora?</div>
-            <div class="quick-gps-grid-container">
+    <!-- GPS REBORN: Instant Access UI -->
+
+    <!-- NOVO: Seletor de Origem (Grid Manual Fallback) -->
+    <div id="wayfinderOriginOverlay" class="wayfinder-origin-overlay">
+        <div class="origin-selector-card">
+            <button class="origin-close-btn" onclick="document.getElementById('wayfinderOriginOverlay').classList.remove('active')">&times;</button>
+            <div class="origin-selector-title">ONDE VOCÊ ESTÁ?</div>
+            
+            <div class="origin-grid-container">
                 <!-- Coluna Frente -->
-                <div class="quick-gps-column">
-                    <div class="quick-gps-column-title">FRENTE</div>
-                    <div class="quick-gps-grid">
-                        <div class="quick-gps-item" onclick="iniciarNavegacaoRapida('A')">A</div>
-                        <div class="quick-gps-item" onclick="iniciarNavegacaoRapida('B')">B</div>
-                        <div class="quick-gps-item" onclick="iniciarNavegacaoRapida('C')">C</div>
-                        <div class="quick-gps-item" onclick="iniciarNavegacaoRapida('D')">D</div>
-                        <div class="quick-gps-item" onclick="iniciarNavegacaoRapida('E')">E</div>
-                        <div class="quick-gps-item" onclick="iniciarNavegacaoRapida('F')">F</div>
-                        <div class="quick-gps-item" onclick="iniciarNavegacaoRapida('G')">G</div>
-                        <div class="quick-gps-item" onclick="iniciarNavegacaoRapida('H')">H</div>
-                        <div class="quick-gps-item" onclick="iniciarNavegacaoRapida('I')">I</div>
-                        <div class="quick-gps-item" onclick="iniciarNavegacaoRapida('J')">J</div>
-                        <div class="quick-gps-item" onclick="iniciarNavegacaoRapida('K')">K</div>
-                        <div class="quick-gps-item" onclick="iniciarNavegacaoRapida('M')">M</div>
-                        <div class="quick-gps-item" onclick="iniciarNavegacaoRapida('L')">L</div>
-                        <div class="quick-gps-item" onclick="iniciarNavegacaoRapida('N')">N</div>
-                        <div class="quick-gps-item" onclick="iniciarNavegacaoRapida('O')">O</div>
+                <div class="origin-column">
+                    <div class="origin-column-title">FRENTE</div>
+                    <div class="origin-btn-grid">
+                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('A')">A</button>
+                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('B')">B</button>
+                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('C')">C</button>
+                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('D')">D</button>
+                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('E')">E</button>
+                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('F')">F</button>
+                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('G')">G</button>
+                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('H')">H</button>
+                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('I')">I</button>
+                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('J')">J</button>
+                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('K')">K</button>
+                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('L')">L</button>
+                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('M')">M</button>
+                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('N')">N</button>
+                        <button class="origin-select-btn" onclick="selecionarOrigemRapida('O')">O</button>
                     </div>
                 </div>
+                
                 <!-- Coluna Verso -->
-                <div class="quick-gps-column">
-                    <div class="quick-gps-column-title">VERSO</div>
-                    <div class="quick-gps-grid">
-                        <div class="quick-gps-item verso" onclick="iniciarNavegacaoRapida('A-VERSO')">A-V</div>
-                        <div class="quick-gps-item verso" onclick="iniciarNavegacaoRapida('B-VERSO')">B-V</div>
-                        <div class="quick-gps-item verso" onclick="iniciarNavegacaoRapida('C-VERSO')">C-V</div>
-                        <div class="quick-gps-item verso" onclick="iniciarNavegacaoRapida('D-VERSO')">D-V</div>
-                        <div class="quick-gps-item verso" onclick="iniciarNavegacaoRapida('E-VERSO')">E-V</div>
-                        <div class="quick-gps-item verso" onclick="iniciarNavegacaoRapida('F-VERSO')">F-V</div>
-                        <div class="quick-gps-item verso" onclick="iniciarNavegacaoRapida('G-VERSO')">G-V</div>
-                        <div class="quick-gps-item verso" onclick="iniciarNavegacaoRapida('H-VERSO')">H-V</div>
-                        <div class="quick-gps-item verso" onclick="iniciarNavegacaoRapida('I-VERSO')">I-V</div>
-                        <div class="quick-gps-item verso" onclick="iniciarNavegacaoRapida('J-VERSO')">J-V</div>
-                        <div class="quick-gps-item verso" onclick="iniciarNavegacaoRapida('K-VERSO')">K-V</div>
+                <div class="origin-column">
+                    <div class="origin-column-title">VERSO</div>
+                    <div class="origin-btn-grid">
+                        <button class="origin-select-btn verso" onclick="selecionarOrigemRapida('A-VERSO')">A-V</button>
+                        <button class="origin-select-btn verso" onclick="selecionarOrigemRapida('B-VERSO')">B-V</button>
+                        <button class="origin-select-btn verso" onclick="selecionarOrigemRapida('C-VERSO')">C-V</button>
+                        <button class="origin-select-btn verso" onclick="selecionarOrigemRapida('D-VERSO')">D-V</button>
+                        <button class="origin-select-btn verso" onclick="selecionarOrigemRapida('E-VERSO')">E-V</button>
+                        <button class="origin-select-btn verso" onclick="selecionarOrigemRapida('F-VERSO')">F-V</button>
+                        <button class="origin-select-btn verso" onclick="selecionarOrigemRapida('G-VERSO')">G-V</button>
+                        <button class="origin-select-btn verso" onclick="selecionarOrigemRapida('H-VERSO')">H-V</button>
+                        <button class="origin-select-btn verso" onclick="selecionarOrigemRapida('I-VERSO')">I-V</button>
+                        <button class="origin-select-btn verso" onclick="selecionarOrigemRapida('J-VERSO')">J-V</button>
+                        <button class="origin-select-btn verso" onclick="selecionarOrigemRapida('K-VERSO')">K-V</button>
                     </div>
                 </div>
+            </div>
+            
+            <div style="margin-top:20px; text-align:center;">
+                <button class="btn" onclick="selecionarOrigemRapida('AUTO')" style="background:var(--color-primary); color:#000; font-size:12px; padding:10px;">USAR MEU GPS AUTOMÁTICO</button>
             </div>
         </div>
     </div>
@@ -8187,16 +8450,20 @@
     <div id="wayfinderModalOverlay" class="wayfinder-modal-overlay">
         <div class="wayfinder-modal">
             <div class="wayfinder-modal-header">
-                <div class="wayfinder-modal-title">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2.5">
-                        <circle cx="12" cy="12" r="10" />
-                        <polyline points="12 6 12 12 16 14" />
+                <button class="modal-close-button" onclick="fecharWayfinderModal()"
+                    style="background:none; border:none; padding:10px;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        style="transform: rotate(180deg);">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
                     </svg>
-                    <span>WAYFINDER GPS</span>
+                </button>
+                <div class="wayfinder-modal-title" style="flex-grow:1; text-align:center; margin-right:44px;">
+                    <span style="font-size:14px; font-weight:900; letter-spacing:2px;">GPS EM TEMPO REAL</span>
                 </div>
-                <button class="modal-close-button" onclick="fecharWayfinderModal()">&times;</button>
             </div>
+            <!-- Botão Entendi (Flutuante Zen) -->
+            <button class="btn-entendi-floating" onclick="fecharWayfinderModal()">ENTENDI</button>
+
             <div class="wayfinder-modal-body">
                 <div class="wayfinder-container"
                     style="background: transparent; box-shadow: none; border: none; padding: 20px;">
@@ -8205,8 +8472,7 @@
                     <div class="wayfinder-hud">
                         <div class="hud-route-wrapper">
                             <!-- Sua Posição (Clicável para abrir seletor) -->
-                            <div class="hud-point origin"
-                                onclick="document.getElementById('wayfinderUserLoc').showPicker ? document.getElementById('wayfinderUserLoc').showPicker() : document.getElementById('wayfinderUserLoc').focus()">
+                            <div class="hud-point origin">
                                 <span class="hud-label"></span>
                                 <span id="wayfinderOriginBadge" class="hud-value origin">?</span>
 
@@ -8288,10 +8554,8 @@
                     </div>
                 </div>
             </div>
-            <div class="wayfinder-modal-footer">
-                <button class="btn" onclick="fecharWayfinderModal()"
-                    style="background: rgba(255,255,255,0.05); color: white; width: auto; padding: 12px 40px; border-radius: 14px; font-weight: 700;">ENTENDI</button>
-            </div>
+            <!-- Footer removido para Zen Mode -->
+            <div class="wayfinder-modal-footer" style="display:none;"></div>
         </div>
     </div>
 </body>
