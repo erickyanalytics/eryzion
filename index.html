@@ -381,7 +381,7 @@
         }
 
         .fade-in-up {
-            animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
 
         /* Skeleton Animation (Eryzion Excellence rule 1) */
@@ -397,12 +397,27 @@
 
         .skeleton-item {
             background: linear-gradient(90deg,
-                    hsla(0, 0%, 100%, 0.05) 25%,
-                    hsla(0, 0%, 100%, 0.1) 50%,
-                    hsla(0, 0%, 100%, 0.05) 75%);
+                    rgba(255, 255, 255, 0.03) 25%,
+                    rgba(255, 255, 255, 0.08) 50%,
+                    rgba(255, 255, 255, 0.03) 75%);
             background-size: 200% 100%;
-            animation: skeleton-loading 1.5s infinite;
-            border-radius: var(--border-radius-md);
+            animation: skeleton-loading 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Desabilita a concha preta durante o skeleton para evitar ghosting */
+        .skeleton-item::after {
+            display: none !important;
+        }
+
+        .skeleton-item::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, transparent 60%, rgba(0,255,65,0.02));
         }
 
         /* Botão de Atalho para Bobinas Temporárias (Relógio) */
@@ -610,33 +625,31 @@
             background: transparent;
             border: none;
             border-radius: 0;
-            padding: 0 18px 28px 18px;
-            margin-bottom: 20px;
+            padding: 0;
+            margin-bottom: 30px;
             position: relative;
-            display: flex;
-            flex-direction: column;
-            gap: 0;
+            display: block; /* Mudança para Block: Mata o estiramento flexbox vertical */
+            width: 100%;
+            height: auto;
+            align-self: flex-start;
             cursor: pointer;
-            box-shadow: none;
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             overflow: visible;
-            will-change: transform, opacity;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Black Shell 3D — Bottom 1/3 */
-        .item-produto::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 25%;
-            background: #000000;
-            border-radius: 30px;
+        /* Solid Shell Wrapper — Eryzion Pocket Refinement */
+        .card-shell-solid {
+            background: transparent; /* Removemos o fundo preto das laterais */
+            border: none;
+            border-radius: 0;
+            padding: 0; /* Mata as bordas pretas laterais */
+            position: relative;
             z-index: 1;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: block;
+            width: 100%;
+            height: auto;
+            box-sizing: border-box;
+            overflow: visible;
         }
 
         /* White Card Content */
@@ -656,12 +669,6 @@
         /* ══════════════════════════════════════════════════
             SPECIFIC CARD VARIATIONS — Eclipse (T.LATERAL)
            ══════════════════════════════════════════════════ */
-        .item-produto.card-eclipse::after {
-            border-radius: 30% / 20%;
-            /* More pronounced oval shell */
-            height: 50%;
-        }
-
         .item-produto.card-eclipse .card-content-white {
             background-color: #ffe4cc;
             /* Soft Orange */
@@ -949,81 +956,74 @@
 
 
 
-        /* Buttons in Shell Area */
-        .card-shell-buttons {
-            padding: 0px 4px 4px 4px;
-            position: relative;
-            z-index: 10;
-            display: flex;
-            gap: 10px;
-        }
-
-        /* CPD Header Premium */
-        .card-cpd-header {
-            display: flex;
-            align-items: baseline;
-            gap: 10px;
-            padding-bottom: 0px;
-            margin-bottom: 0px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-            padding-right: 145px;
-        }
-
-        /* ═══════════════════════════════════════════════
-           FLIP CARD 3D — Aura Rotation System
-        ═══════════════════════════════════════════════ */
         .card-flip-wrapper {
             perspective: 1200px;
             position: relative;
-            z-index: 2;
+            z-index: 5; /* Garante que o card branco fique por cima do bolso */
+            margin-bottom: 0px;
+        }
+
+        .card-shell-buttons {
+            background: #000000; /* O fundo preto agora mora aqui */
+            border-radius: 0 0 35px 35px;
+            padding: 25px 16px 16px 16px; /* Padding superior maior para o efeito de encaixe */
+            margin-top: -20px; /* Sobe a concha para "vestir" o card branco */
+            position: relative;
+            z-index: 1; /* Fica atrás do card branco */
+            display: flex; /* Alinhamento horizontal dos botões */
+            gap: 12px;
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-top: none;
         }
 
         .card-flip-inner {
+            display: grid; /* Grid Stacker: Frente e Verso no mesmo lugar */
+            grid-template-columns: 1fr;
+            grid-template-rows: 1fr;
             position: relative;
             width: 100%;
             transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
+            height: auto;
+            contain: layout style;
         }
 
         .card-flip-inner.flipped {
             transform: rotateY(180deg);
         }
 
-        .card-flip-inner.flipped .card-front {
-            pointer-events: none;
-        }
-
-        .card-flip-inner:not(.flipped) .card-back {
-            pointer-events: none;
-        }
-
         .card-front,
         .card-back {
+            grid-area: 1/1; /* Ambas ocupam a mesma célula de grid */
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
+            width: 100%;
+            height: auto;
+            box-sizing: border-box;
         }
 
         .card-front {
             position: relative;
+            z-index: 2;
         }
 
         .card-back {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
             transform: rotateY(180deg);
             background: #ffffff;
             border-radius: 24px 24px 14px 14px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
             border: 1px solid rgba(0, 0, 0, 0.06);
             padding: 24px;
-            gap: 16px;
+            gap: 12px;
+            overflow: hidden;
+            z-index: 1;
         }
 
         .card-back .qr-title-back {
@@ -1068,10 +1068,11 @@
         }
 
         .btn-flip-card:hover {
-            background: rgba(0, 0, 0, 0.1);
+            background: var(--color-primary);
             color: #000;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px) rotate(15deg);
+            box-shadow: 0 6px 20px rgba(0, 255, 65, 0.3);
+            border-color: var(--color-primary);
         }
 
         .btn-flip-card:active {
@@ -1154,11 +1155,7 @@
 
         /* Hover Effects */
         .item-produto:hover {
-            transform: translateY(-4px);
-        }
-
-        .item-produto:hover::after {
-            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.4);
+            transform: translateY(-8px);
         }
 
         .item-produto:hover .card-content-white {
@@ -1491,33 +1488,73 @@
             display: flex !important;
         }
 
-        /* Form Aviso no Verso */
-        .aviso-verso-form {
+        /* Form Aviso no Verso — Eryzion Premium Style */
+        .aviso-form-card {
             width: 100%;
             height: 100%;
             display: flex;
             flex-direction: column;
             gap: 12px;
-            padding-top: 15px;
+            padding-top: 10px;
+            overflow: hidden; /* Garante que nada transborde e force o shell */
         }
 
-        .aviso-verso-form input,
-        .aviso-verso-form textarea {
+        .aviso-input-card {
             width: 100%;
-            background: rgba(0,0,0,0.03);
-            border: 1px solid rgba(0,0,0,0.1);
+            background: rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.1);
             color: #000;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 12px;
+            border-radius: 12px;
             font-size: 13px;
+            font-family: inherit;
+            transition: var(--transition-normal);
+            outline: none;
         }
 
-        .aviso-verso-form label {
-            color: #444;
+        .aviso-input-card:focus {
+            border-color: #000;
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .aviso-status-card {
+            min-height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 11px;
+            color: #666;
+            margin: 4px 0;
+            transition: all 0.3s ease;
+        }
+
+        .btn-enviar-aviso-card {
+            background: #000000;
+            color: #ffffff;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
             font-weight: 800;
-            margin-bottom: -8px;
+            font-size: 12px;
+            letter-spacing: 1px;
             text-transform: uppercase;
+            cursor: pointer;
+            transition: var(--transition-normal);
+            width: 100%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-enviar-aviso-card:hover:not(:disabled) {
+            background: #222;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-enviar-aviso-card:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
         }
 
         .qrcode-image {
@@ -1580,8 +1617,19 @@
             transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        .spinner-mini {
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-top-color: #00ff41;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
         .btn-card-temp:hover {
-            background: rgba(255, 204, 255, 0.1);
+            background: rgba(255, 204, 0, 0.1);
             color: #ffcc00;
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(255, 204, 0, 0.1);
@@ -3243,13 +3291,27 @@
             }
 
             .item-produto {
-                padding: 0 10px 22px 10px;
-                margin-bottom: 16px;
+                padding: 0;
+                margin-bottom: 25px;
+                display: block;
+                height: auto;
             }
 
-            .item-produto::after {
-                border-radius: 22px;
+            .card-shell-solid {
+                background: transparent;
+                padding: 0;
+                display: block;
+                height: auto;
             }
+
+            .card-shell-buttons {
+                border-radius: 0 0 30px 30px;
+                padding: 22px 12px 12px 12px;
+                margin-top: -18px;
+                background: #000;
+            }
+
+            /* Removido ::after legado para estabilização total do shell */
 
             .card-content-white {
                 padding: 16px;
@@ -5381,6 +5443,97 @@
             }, 4000);
         }
 
+        // 🎙️ ERYZION VOICE ENGINE: INTELIGÊNCIA E SIMILARIDADE
+        const VOICE_ALIASES = {
+            "VERMELHO": "VM",
+            "VERDE": "VD",
+            "AZUL": "AZ",
+            "AMARELO": "AM",
+            "PRETO": "PT",
+            "BRANCO": "BR",
+            "MARROM": "MA",
+            "CINZA": "CZ",
+            "LARANJA": "LR",
+            "ROSA": "RS",
+            "ROXO": "RX",
+            "CONDVOLT": "CONDVOLT",
+            "CONDEVOLTE": "CONDVOLT",
+            "CONDI": "COND"
+        };
+
+        let SEARCHABLE_TERMS_VOICE = [];
+
+        // Função de similaridade (Dice's Coefficient) - Eryzion Premium Accuracy
+        function getSimilarityScore(s1, s2) {
+            s1 = s1.replace(/\s+/g, '');
+            s2 = s2.replace(/\s+/g, '');
+            if (s1 === s2) return 1.0;
+            if (s1.length < 2 || s2.length < 2) return 0;
+
+            const bigrams1 = new Map();
+            for (let i = 0; i < s1.length - 1; i++) {
+                const bigram = s1.substring(i, i + 2);
+                const count = bigrams1.has(bigram) ? bigrams1.get(bigram) + 1 : 1;
+                bigrams1.set(bigram, count);
+            }
+
+            let intersection = 0;
+            for (let i = 0; i < s2.length - 1; i++) {
+                const bigram = s2.substring(i, i + 2);
+                const count = bigrams1.has(bigram) ? bigrams1.get(bigram) : 0;
+                if (count > 0) {
+                    bigrams1.set(bigram, count - 1);
+                    intersection++;
+                }
+            }
+            return (2.0 * intersection) / (s1.length + s2.length - 2);
+        }
+
+        window.prepararIndicesVoz = function () {
+            const termos = new Set();
+            PRODUTOS.forEach(p => {
+                if (p.CPD) termos.add(p.CPD.toString().toUpperCase());
+                if (p['Cód.Fabricante']) termos.add(p['Cód.Fabricante'].toString().toUpperCase());
+                if (p.Mercado) {
+                    // Adiciona o mercado completo e também partes dele
+                    const mercado = p.Mercado.toString().toUpperCase();
+                    termos.add(mercado);
+                }
+            });
+            SEARCHABLE_TERMS_VOICE = Array.from(termos);
+            console.log(`[VoiceAI] ${SEARCHABLE_TERMS_VOICE.length} termos técnicos indexados.`);
+        };
+
+        function findBestVoiceMatch(transcript) {
+            transcript = transcript.toUpperCase().trim();
+
+            // 1. Check direct aliases first
+            if (VOICE_ALIASES[transcript]) return VOICE_ALIASES[transcript];
+
+            // 2. Scan database for closest match
+            let bestMatch = null;
+            let highestScore = 0;
+
+            // Limite de processamento para bases gigantes (Eryzion Performance Rule)
+            const pool = SEARCHABLE_TERMS_VOICE;
+            for (let i = 0; i < pool.length; i++) {
+                const score = getSimilarityScore(transcript, pool[i]);
+                if (score > highestScore) {
+                    highestScore = score;
+                    bestMatch = pool[i];
+                }
+                if (highestScore === 1.0) break; // Perfect match found
+            }
+
+            // Exibir toast educativo se houve correção significativa
+            if (highestScore > 0.5 && highestScore < 1.0 && bestMatch !== transcript) {
+                showToast(`Corrigido: "${transcript}" → "${bestMatch}"`, 'info');
+                return bestMatch;
+            }
+
+            return highestScore > 0.5 ? bestMatch : transcript;
+        }
+
         // 🎙️ SISTEMA DE BUSCA POR VOZ (Eryzion Voice)
         let isVoiceRecording = false;
         let recognition = null;
@@ -5412,10 +5565,12 @@
             };
 
             recognition.onresult = (event) => {
-                let speechToText = event.results[0][0].transcript.toUpperCase();
-                // Formatação Eryzion: A%B%C
-                const formatted = speechToText.split('').join('%');
-                input.value = formatted;
+                let transcript = event.results[0][0].transcript.toUpperCase();
+                
+                // Inteligência Eryzion: Encontra o melhor match técnico
+                let finalTerm = findBestVoiceMatch(transcript);
+                
+                input.value = finalTerm;
                 handleInput(); // Dispara busca automática
             };
 
@@ -5439,6 +5594,21 @@
             const btn = document.getElementById('voiceSearchBtn');
             if (btn) btn.classList.remove('voice-recording');
         }
+
+        // 🧠 ERYZION SMART FORMATTING ENGINE
+        window.smartFormatEryzion = function (el, type) {
+            let val = el.value;
+            if (!val) return;
+
+            if (type === 'name') {
+                // Title Case: joão silva -> João Silva
+                el.value = val.toLowerCase().replace(/(?:^|\s)\S/g, function (a) { return a.toUpperCase(); });
+            } else if (type === 'sentence') {
+                // Sentence Case: problema no cabo -> Problema no cabo
+                val = val.trimStart();
+                el.value = val.charAt(0).toUpperCase() + val.slice(1);
+            }
+        };
 
         // 🔄 CARD FLIP AVISO (Eryzion Flip Refinement)
         window.toggleCardBackView = function (cpd, view) {
@@ -5480,7 +5650,7 @@
                     informacao: info
                 });
 
-                await fetch(`https://script.google.com/macros/s/${CONFIG.GAS_AVISOS}/exec`, {
+                await fetchWithTimeout(`https://script.google.com/macros/s/${CONFIG.GAS_AVISOS}/exec`, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -6164,6 +6334,7 @@
 
                     // Atualiza Filtros Dinâmicos apenas se os produtos mudaram
                     extrairValoresUnicos();
+                    window.prepararIndicesVoz(); // NOVO: Indexa termos para busca por voz inteligente
 
                     if (window.requestIdleCallback) {
                         requestIdleCallback(() => preencherSelectsFiltros());
@@ -6393,11 +6564,11 @@
         function renderResults(results, term, type, isAutoRefresh = false, isLoading = false) {
             // [NEW] ZERO DOM CHURN (Eryzion Quality)
             // Gera um fingerprint rápido dos resultados para evitar re-renderizar o que é idêntico
-            const fingerprint = isLoading ? 'loading' : results.slice(0, 10).map(p => `${p.CPD}|${p.temp_prat || ''}|${p.temp_local || ''}`).join(';');
+            const fingerprint = isLoading ? 'loading' : `${results.length}|${results.slice(0, 20).map(p => `${p.CPD}|${p.temp_prat || ''}`).join(';')}`;
             if (!isLoading && fingerprint === window._lastRenderFingerprint && !isAutoRefresh) {
                 return; // Dados idênticos, pula renderização pesada
             }
-            window._lastRenderRenderFingerprint = fingerprint;
+            window._lastRenderFingerprint = fingerprint;
 
             // [NEW] SKELETON LOADING (Eryzion Rule 1)
             if (isLoading) {
@@ -6506,52 +6677,54 @@
 
                     div.onclick = () => window.abrirModalPorIndice(i);
                     div.innerHTML = `
-                        <div class="card-flip-wrapper">
-                            <div class="card-flip-inner" id="flipInner-${cpd}">
-                                <div class="card-front">
-                                    <div class="card-content-white">
-                                        <button class="btn-aviso" title="Registrar Aviso" onclick="event.stopPropagation(); window.toggleCardBackView('${cpd}', 'aviso'); window.flipCard('${cpd}')">🔔</button>
-                                        <button class="btn-quick-gps" title="GPS Rápido" onclick="event.stopPropagation(); window.abrirWayfinderRapido(${i})">
-                                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                                        </button>
-                                        <button class="btn-flip-card" onclick="event.stopPropagation(); window.flipCard('${cpd}')">
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>
-                                        </button>
-                                        <div class="card-cpd-header"><span class="cpd-label">CPD</span><span class="cpd-value">${formatarValor('CPD', p.CPD, term, "", highlightRegex)}</span></div>
-                                        <div class="card-technical-data"><span class="data-label">Cód.Fabricante</span><span class="data-value">${formatarValor('Cód.Fabricante', p['Cód.Fabricante'], term, "", highlightRegex)}</span></div>
-                                        <div class="chips-container" style="margin-top: 10px;">
-                                            <div class="data-chip"><span class="chip-label">Mercado</span><span class="chip-val">${formatarValor('Mercado', p.Mercado, term, "", highlightRegex)}</span></div>
-                                            <div class="data-chip"><span class="chip-label">Prateleira</span><span class="chip-val">${formatarValor('Prateleira', p.Prateleira, term, "", highlightRegex)}</span></div>
-                                            <div class="data-chip"><span class="chip-label">Local</span><span class="chip-val highlight">${formatarValor('Local', p.Local, term, "", highlightRegex)}</span></div>
-                                            <div class="data-chip"><span class="chip-label">Radar Atual</span><span class="chip-val">${formatarValor('Radar', radarStatus, term, "", highlightRegex)}</span></div>
-                                            ${corHtml}
-                                            <div class="data-chip full"><span class="chip-label" style="color: #a855f7;">Aplicador Principal</span><span class="chip-val">${formatarValor('Aplicador', p.Aplicador, term, "", highlightRegex)}</span></div>
-                                            ${tempHtml}
+                        <div class="card-shell-solid">
+                            <div class="card-flip-wrapper">
+                                <div class="card-flip-inner" id="flipInner-${cpd}">
+                                    <div class="card-front">
+                                        <div class="card-content-white">
+                                            <button class="btn-aviso" title="Registrar Aviso" onclick="event.stopPropagation(); window.toggleCardBackView('${cpd}', 'aviso'); window.flipCard('${cpd}')">🔔</button>
+                                            <button class="btn-quick-gps" title="GPS Rápido" onclick="event.stopPropagation(); window.abrirWayfinderRapido(${i})">
+                                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                            </button>
+                                            <button class="btn-flip-card" onclick="event.stopPropagation(); window.flipCard('${cpd}')">
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>
+                                            </button>
+                                            <div class="card-cpd-header"><span class="cpd-label">CPD</span><span class="cpd-value">${formatarValor('CPD', p.CPD, term, "", highlightRegex)}</span></div>
+                                            <div class="card-technical-data"><span class="data-label">Cód.Fabricante</span><span class="data-value">${formatarValor('Cód.Fabricante', p['Cód.Fabricante'], term, "", highlightRegex)}</span></div>
+                                            <div class="chips-container" style="margin-top: 10px;">
+                                                <div class="data-chip"><span class="chip-label">Mercado</span><span class="chip-val">${formatarValor('Mercado', p.Mercado, term, "", highlightRegex)}</span></div>
+                                                <div class="data-chip"><span class="chip-label">Prateleira</span><span class="chip-val">${formatarValor('Prateleira', p.Prateleira, term, "", highlightRegex)}</span></div>
+                                                <div class="data-chip"><span class="chip-label">Local</span><span class="chip-val highlight">${formatarValor('Local', p.Local, term, "", highlightRegex)}</span></div>
+                                                <div class="data-chip"><span class="chip-label">Radar Atual</span><span class="chip-val">${formatarValor('Radar', radarStatus, term, "", highlightRegex)}</span></div>
+                                                ${corHtml}
+                                                <div class="data-chip full"><span class="chip-label" style="color: #a855f7;">Aplicador Principal</span><span class="chip-val">${formatarValor('Aplicador', p.Aplicador, term, "", highlightRegex)}</span></div>
+                                                ${tempHtml}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="card-back">
-                                    <div id="qr-view-${cpd}" class="card-back-view active">
-                                        <button class="btn-flip-card" onclick="event.stopPropagation(); window.flipCard('${cpd}')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg></button>
-                                        <h3 class="qr-title-back">QRCode Mercado</h3>
-                                        <div class="qr-electric-container"><div class="qr-card-container"><div class="qr-white-wrapper"><img class="qrcode-image" src="${qrUrl}" alt="QR" loading="lazy"></div></div></div>
-                                    </div>
-                                    <div id="aviso-view-${cpd}" class="card-back-view">
-                                        <button class="btn-flip-card" onclick="event.stopPropagation(); window.toggleCardBackView('${cpd}', 'qr')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg></button>
-                                        <h3 class="qr-title-back" style="color: #ff4444;">Registrar Aviso</h3>
-                                        <div class="aviso-form-card">
-                                            <input type="text" id="avisoNome-${cpd}" placeholder="Seu Nome" class="aviso-input-card">
-                                            <textarea id="avisoInfo-${cpd}" placeholder="Qual o problema detectado?" class="aviso-input-card" style="height: 60px; resize: none;"></textarea>
-                                            <div id="avisoStatus-${cpd}" class="aviso-status-card"></div>
-                                            <button class="btn-enviar-aviso-card" onclick="event.stopPropagation(); window.enviarAvisoNoVerso('${cpd}', '${p['Cód.Fabricante']}')">ENVIAR AVISO</button>
+                                    <div class="card-back">
+                                        <div id="qr-view-${cpd}" class="card-back-view active">
+                                            <button class="btn-flip-card" onclick="event.stopPropagation(); window.flipCard('${cpd}')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg></button>
+                                            <h3 class="qr-title-back">QRCode Mercado</h3>
+                                            <div class="qr-electric-container"><div class="qr-card-container"><div class="qr-white-wrapper"><img class="qrcode-image" src="${qrUrl}" alt="QR" loading="lazy"></div></div></div>
+                                        </div>
+                                        <div id="aviso-view-${cpd}" class="card-back-view">
+                                            <button class="btn-flip-card" onclick="event.stopPropagation(); window.flipCard('${cpd}'); setTimeout(() => window.toggleCardBackView('${cpd}', 'qr'), 350)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg></button>
+                                            <h3 class="qr-title-back" style="color: #ff4444;">Registrar Aviso</h3>
+                                            <div class="aviso-form-card" onclick="event.stopPropagation()">
+                                                <input type="text" id="avisoNome-${cpd}" placeholder="Seu Nome" class="aviso-input-card" oninput="window.smartFormatEryzion(this, 'name')">
+                                                <textarea id="avisoInfo-${cpd}" placeholder="Qual o problema detectado?" class="aviso-input-card" style="height: 60px; resize: none;" oninput="window.smartFormatEryzion(this, 'sentence')"></textarea>
+                                                <div id="avisoStatus-${cpd}" class="aviso-status-card"></div>
+                                                <button class="btn-enviar-aviso-card" onclick="event.stopPropagation(); window.enviarAvisoNoVerso('${cpd}', '${p['Cód.Fabricante']}')">ENVIAR AVISO</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="card-shell-buttons" style="margin-top: 8px;">
-                            <button type="button" class="btn-modify-loc" style="flex: 1;" onclick="event.stopPropagation(); window.abrirModalPorIndice(${i})">Reposicionar</button>
-                            <button type="button" class="btn-modify-loc" style="flex: 1; background: #059669;" onclick="event.stopPropagation(); showDelphusInfo('${cpd}'); fetchEstoqueDelphus('${cpd}')">Delphus</button>
+                            <div class="card-shell-buttons">
+                                <button type="button" class="btn-modify-loc" style="flex: 1;" onclick="event.stopPropagation(); window.abrirModalPorIndice(${i})">Reposicionar</button>
+                                <button type="button" class="btn-modify-loc" style="flex: 1; background: #059669;" onclick="event.stopPropagation(); showDelphusInfo('${cpd}'); fetchEstoqueDelphus('${cpd}')">Delphus</button>
+                            </div>
                         </div>
                     `;
                 }
@@ -6788,9 +6961,8 @@
 
             try {
                 // Etapa 1: Envia CPD para fila do bot via URL nativa AppScript
-                const sendUrl = `${CONFIG.DELPHUS_BOT_URL}?action=enviarEstoque&cpd=${encodeURIComponent(cpd)}`;
-                const response = await fetch(sendUrl);
-                const data = await response.json();
+                const data = await apiFetch(sendUrl);
+
 
                 if (data.status === 'success') {
                     // Se já tem dados de estoque existentes, mostra imediatamente
@@ -6854,9 +7026,8 @@
                     if (timer) clearInterval(timer);
                     // Timeout: tenta ler direto de DadosFormatados como última tentativa
                     try {
-                        const url = `${CONFIG.DELPHUS_BOT_URL}?action=estoque&cpd=${encodeURIComponent(cpd)}`;
-                        const res = await fetch(url);
-                        const d = await res.json();
+                        const d = await apiFetch(url);
+
                         if (d.status === 'success' && (d.estoque || d.estoqueLp || d.estoqueCorte)) {
                             ESTOQUE_CACHE[cpd] = {
                                 status: 'done',
@@ -6886,9 +7057,8 @@
 
                 try {
                     // Verifica status do robô + já tenta pegar estoque na mesma batida
-                    const statusUrl = `${CONFIG.DELPHUS_BOT_URL}?action=status&row=${row}&cpd=${encodeURIComponent(cpd)}`;
-                    const res = await fetch(statusUrl);
-                    const doc = await res.json();
+                    const doc = await apiFetch(statusUrl);
+
 
                     if (doc.status === 'success') {
                         const rStatus = (doc.robostatus || '').toLowerCase().trim();
@@ -6980,12 +7150,13 @@
             params.append('action', 'registrarPesquisa');
             params.append('cpd', cpd);
 
-            fetch(scriptUrl, {
+            fetchWithTimeout(scriptUrl, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: params.toString()
             }).catch(err => console.error('Erro ao registrar pesquisa:', err));
+
         }
 
         /* ══════════════════════════════════════════════════
@@ -7728,7 +7899,7 @@
                     terminal: "'" + fabricante,
                     informacao: info
                 });
-                await fetch(`https://script.google.com/macros/s/${CONFIG.GAS_AVISOS}/exec`, {
+                await fetchWithTimeout(`https://script.google.com/macros/s/${CONFIG.GAS_AVISOS}/exec`, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: {
@@ -7860,7 +8031,7 @@
                 console.log('📡 [Sincronizando] Enviando para Pesquisa Backend (GS):', finalUrl);
 
                 // Await garante que a requisição seja disparada
-                await fetch(finalUrl, {
+                await fetchWithTimeout(finalUrl, {
                     method: 'GET',
                     mode: 'no-cors',
                     cache: 'no-cache'
@@ -8218,7 +8389,7 @@
                 });
 
                 // Chama a API unificada passando action radarSet
-                fetch(`https://script.google.com/macros/s/${CONFIG.GAS_HEATMAP}/exec`, {
+                fetchWithTimeout(`https://script.google.com/macros/s/${CONFIG.GAS_HEATMAP}/exec`, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
