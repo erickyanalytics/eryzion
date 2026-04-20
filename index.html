@@ -46,9 +46,17 @@
 
         /* 🎙️ Voice Search & UX Fixes */
         @keyframes voice-pulse {
-            0% { box-shadow: 0 0 0 0 rgba(0, 255, 65, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(0, 255, 65, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(0, 255, 65, 0); }
+            0% {
+                box-shadow: 0 0 0 0 rgba(0, 255, 65, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(0, 255, 65, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 255, 65, 0);
+            }
         }
 
         .voice-recording {
@@ -416,8 +424,11 @@
         .skeleton-item::before {
             content: "";
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, transparent 60%, rgba(0,255,65,0.02));
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent 60%, rgba(0, 255, 65, 0.02));
         }
 
         /* Botão de Atalho para Bobinas Temporárias (Relógio) */
@@ -628,22 +639,26 @@
             padding: 0;
             margin-bottom: 30px;
             position: relative;
-            display: block; /* Mudança para Block: Mata o estiramento flexbox vertical */
+            display: block;
+            /* Mudança para Block: Mata o estiramento flexbox vertical */
             width: 100%;
             height: auto;
             align-self: flex-start;
             cursor: pointer;
             overflow: visible;
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            contain: style; /* Perf: isola style recalc sem quebrar overflow visible */
+            contain: style;
+            /* Perf: isola style recalc sem quebrar overflow visible */
         }
 
         /* Solid Shell Wrapper — Eryzion Pocket Refinement */
         .card-shell-solid {
-            background: transparent; /* Removemos o fundo preto das laterais */
+            background: transparent;
+            /* Removemos o fundo preto das laterais */
             border: none;
             border-radius: 0;
-            padding: 0; /* Mata as bordas pretas laterais */
+            padding: 0;
+            /* Mata as bordas pretas laterais */
             position: relative;
             z-index: 1;
             display: block;
@@ -953,25 +968,27 @@
         }
 
 
-
-
-
-
         .card-flip-wrapper {
             perspective: 1200px;
             position: relative;
-            z-index: 5; /* Garante que o card branco fique por cima do bolso */
+            z-index: 5;
+            /* Garante que o card branco fique por cima do bolso */
             margin-bottom: 0px;
         }
 
         .card-shell-buttons {
-            background: #000000; /* O fundo preto agora mora aqui */
+            background: #000000;
+            /* O fundo preto agora mora aqui */
             border-radius: 0 0 35px 35px;
-            padding: 25px 16px 16px 16px; /* Padding superior maior para o efeito de encaixe */
-            margin-top: -20px; /* Sobe a concha para "vestir" o card branco */
+            padding: 25px 16px 16px 16px;
+            /* Padding superior maior para o efeito de encaixe */
+            margin-top: -20px;
+            /* Sobe a concha para "vestir" o card branco */
             position: relative;
-            z-index: 1; /* Fica atrás do card branco */
-            display: flex; /* Alinhamento horizontal dos botões */
+            z-index: 1;
+            /* Fica atrás do card branco */
+            display: flex;
+            /* Alinhamento horizontal dos botões */
             gap: 12px;
             width: 100%;
             box-sizing: border-box;
@@ -981,7 +998,8 @@
         }
 
         .card-flip-inner {
-            display: grid; /* Grid Stacker: Frente e Verso no mesmo lugar */
+            display: grid;
+            /* Grid Stacker: Frente e Verso no mesmo lugar */
             grid-template-columns: 1fr;
             grid-template-rows: 1fr;
             position: relative;
@@ -998,17 +1016,18 @@
 
         .card-front,
         .card-back {
-            grid-area: 1/1; /* Ambas ocupam a mesma célula de grid */
+            grid-area: 1/1;
+            /* Ambas ocupam a mesma célula de grid */
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
             width: 100%;
-            height: auto;
             box-sizing: border-box;
         }
 
         .card-front {
             position: relative;
             z-index: 2;
+            height: auto;
         }
 
         .card-back {
@@ -1025,6 +1044,12 @@
             gap: 12px;
             overflow: hidden;
             z-index: 1;
+            /* Impede que o verso branco cresça além da frente e sobreponha os botões */
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
         }
 
         .card-back .qr-title-back {
@@ -1497,7 +1522,8 @@
             flex-direction: column;
             gap: 12px;
             padding-top: 10px;
-            overflow: hidden; /* Garante que nada transborde e force o shell */
+            overflow: hidden;
+            /* Garante que nada transborde e force o shell */
         }
 
         .aviso-input-card {
@@ -2823,7 +2849,8 @@
 
         /* O Cubo se transforma no núcleo do buraco negro */
         .cube-wrapper.black-hole {
-            animation: hole-vibrate 0.15s 20 alternate; /* Perf: limitado a 20 ciclos, não infinite */
+            animation: hole-vibrate 0.15s 20 alternate;
+            /* Perf: limitado a 20 ciclos, não infinite */
             transition: transform 0.8s cubic-bezier(0.6, -0.28, 0.735, 0.045);
         }
 
@@ -3800,7 +3827,10 @@
            PERFORMANCE: REDUCED MOTION + DEVICE OPTIMIZATION
            ══════════════════════════════════════════════════ */
         @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
+
+            *,
+            *::before,
+            *::after {
                 animation-duration: 0.01ms !important;
                 animation-iteration-count: 1 !important;
                 transition-duration: 0.01ms !important;
@@ -3810,23 +3840,35 @@
         /* Otimizações globais para dispositivos fracos */
         @media (max-width: 480px) {
             .data-chip {
-                transition: none; /* Remove hover transition em mobile */
+                transition: none;
+                /* Remove hover transition em mobile */
             }
+
             .data-chip:hover {
                 transform: none;
                 box-shadow: none;
             }
+
             .card-flip-inner {
-                transition-duration: 0.3s; /* Flip mais rápido em mobile */
+                transition-duration: 0.3s;
+                /* Flip mais rápido em mobile */
             }
-            .btn-aviso, .btn-flip-card, .btn-card-temp {
-                transition: none; /* Remove transitions dos botões em mobile */
+
+            .btn-aviso,
+            .btn-flip-card,
+            .btn-card-temp {
+                transition: none;
+                /* Remove transitions dos botões em mobile */
             }
+
             .card-content-white {
-                transition: none; /* Remove hover transitions pesadas */
+                transition: none;
+                /* Remove hover transitions pesadas */
             }
+
             .item-produto {
-                transition: none; /* Remove transition de transform no card */
+                transition: none;
+                /* Remove transition de transform no card */
             }
         }
     </style>
@@ -3881,8 +3923,10 @@
                                 </svg>
                             </button>
 
-                            <button type="button" id="voiceSearchBtn" class="hero-btn-dark" title="Busca por Voz" onclick="toggleVoiceSearch()">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <button type="button" id="voiceSearchBtn" class="hero-btn-dark" title="Busca por Voz"
+                                onclick="toggleVoiceSearch()">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
                                     <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
                                     <line x1="12" y1="19" x2="12" y2="22"></line>
@@ -4599,10 +4643,10 @@
 
             recognition.onresult = (event) => {
                 let transcript = event.results[0][0].transcript.toUpperCase();
-                
+
                 // Inteligência Eryzion: Encontra o melhor match técnico
                 let finalTerm = findBestVoiceMatch(transcript);
-                
+
                 input.value = finalTerm;
                 handleInput(); // Dispara busca automática
             };
